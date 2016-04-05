@@ -5,11 +5,13 @@
 
 using namespace std;
 
+#define COMPARE_DIFF 5.0f
+
 int main()
 {
 	//file open
-	ifstream mfile("song-m-pitch.txt");
-	ifstream ffile("song-f-pitch.txt");
+	ifstream mfile("datas/song-m-pitch.txt");
+	ifstream ffile("datas/song-f-pitch.txt");
 
 	//pitch vector
 	vector<float> malePitch;
@@ -107,7 +109,7 @@ int main()
 	//exist both data - compare
 	int mSound = 0, fSound = 0;
 	vector<bool> correct;
-	int corretCnt = 0;
+	int correctCnt = 0;
 	int min = 0;
 	if (femalePitch.size() > malePitch.size())
 	{
@@ -118,21 +120,27 @@ int main()
 		min = femalePitch.size();
 	}
 
-	while (min>0) {
-		while (femalePitch[fSound] != 0 && malePitch[mSound] != 0) {
+	while (min > 0) {
+		while (femalePitch[fSound] != 0 && malePitch[mSound] != 0)
+		{
 			//male-10 < female < male+10 ? check similar.
-			if (malePitch[mSound] - 10 < femalePitch[fSound] && femalePitch[fSound] < malePitch[mSound] + 10) {
+			//if (malePitch[mSound] - 10 < femalePitch[fSound] && femalePitch[fSound] < malePitch[mSound] + 10)
+			if (abs(femalePitch[fSound] - malePitch[mSound]) < COMPARE_DIFF)
+			{
 				correct.push_back(true);
-				corretCnt++;
+				correctCnt++;
 			}
-			else {
+			else
+			{
 				correct.push_back(false);
 			}
 			fSound++; mSound++;
 		}
 		min--;
 	}
-
+	//print corrected count, percent
+	cout << "corrected count: " << correctCnt << endl;
+	cout << "corrected percent: " << (float)correctCnt / (float)fSound * 100 << "%" << endl;
 	mfile.close();
 	ffile.close();
 	return 0;
