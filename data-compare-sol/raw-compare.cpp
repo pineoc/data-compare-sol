@@ -10,8 +10,8 @@ using namespace std;
 int main(int argc, char* argv[])
 {
 	//file open
-	ifstream mfile("datas/song-m-pitch.txt");
-	ifstream ffile("datas/song-f-pitch.txt");
+	ifstream mfile(argv[1]);
+	ifstream ffile(argv[2]);
 
 	//pitch vector
 	vector<float> malePitch;
