@@ -7,7 +7,7 @@ using namespace std;
 
 #define COMPARE_DIFF 5.0f
 
-int main()
+int main(int argc, char* argv[])
 {
 	//file open
 	ifstream mfile("datas/song-m-pitch.txt");
