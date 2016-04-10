@@ -189,11 +189,11 @@ vector<double> compare::getIntensityData()
 
 double compare::raw_compare_pitch()
 {
+	//pitch data push to vector
 	setPitchData();
 	/*compare two voice*/
 	//exist both data - compare
 	int pos = 0;
-	vector<bool> correct;
 	int correctCnt = 0;
 	int min = 0;
 	if (standPitchVec.size() > compPitchVec.size())
@@ -210,14 +210,8 @@ double compare::raw_compare_pitch()
 		{
 			//male-10 < female < male+10 ? check similar.
 			if (abs(standPitchVec[pos] - compPitchVec[pos]) < RAW_PITCH_COMPARE_DIFF)
-			{
-				correct.push_back(true);
 				correctCnt++;
-			}
-			else
-			{
-				correct.push_back(false);
-			}
+			
 			pos++;
 		}
 		min--;
@@ -235,11 +229,12 @@ double compare::raw_compare_formant()
 
 double compare::raw_compare_intensity()
 {
+	//intencity data push to vector
 	setIntensityData();
+
 	/*compare two voice*/
 	//exist both data - compare
 	int pos = 0;
-	vector<bool> correct;
 	int correctCnt = 0;
 	int min = 0;
 	if (standIntencityVec.size() > compIntencityVec.size())
@@ -256,14 +251,8 @@ double compare::raw_compare_intensity()
 		{
 			//male-10 < female < male+10 ? check similar.
 			if (abs(standIntencityVec[pos] - compIntencityVec[pos]) < RAW_INTENSITY_COMPARE_DIFF)
-			{
-				correct.push_back(true);
 				correctCnt++;
-			}
-			else
-			{
-				correct.push_back(false);
-			}
+			
 			pos++;
 		}
 		min--;
