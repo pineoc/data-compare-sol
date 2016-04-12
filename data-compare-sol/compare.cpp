@@ -265,7 +265,26 @@ double compare::raw_compare_intensity()
 
 double compare::cosine_compare_pitch()
 {
-	return 0.0;
+	double similarityValue = 0.0;
+	double topValue = 0.0;
+	double bottomValue = 0.0;
+	double bottomVal1 = 0.0, bottomVal2 = 0.0;
+
+	//vector length set
+	int vecLength = min(standPitchVec.size(), compPitchVec.size());
+
+	//top value sum
+	for (int i = 0; i < vecLength; i++)
+		topValue += standPitchVec[i] * compPitchVec[i];
+
+	for (int i = 0; i < vecLength; i++)
+	{
+		bottomVal1 += pow(standPitchVec[i], 2);
+		bottomVal2 += pow(compPitchVec[i], 2);
+	}
+	bottomValue = sqrt(bottomVal1) * sqrt(bottomVal2);
+	similarityValue = topValue / bottomValue;
+	return similarityValue;
 }
 
 double compare::cosine_compare_formant()
@@ -275,5 +294,24 @@ double compare::cosine_compare_formant()
 
 double compare::cosine_compare_intensity()
 {
-	return 0.0;
+	double similarityValue = 0.0;
+	double topValue = 0.0;
+	double bottomValue = 0.0;
+	double bottomVal1 = 0.0, bottomVal2 = 0.0;
+
+	//vector length set
+	int vecLength = min(standIntencityVec.size(), compIntencityVec.size());
+
+	//top value sum
+	for (int i = 0; i < vecLength; i++)
+		topValue += standIntencityVec[i] * compIntencityVec[i];
+
+	for (int i = 0; i < vecLength; i++)
+	{
+		bottomVal1 += pow(standIntencityVec[i], 2);
+		bottomVal2 += pow(compIntencityVec[i], 2);
+	}
+	bottomValue = sqrt(bottomVal1) * sqrt(bottomVal2);
+	similarityValue = topValue / bottomValue;
+	return similarityValue;
 }

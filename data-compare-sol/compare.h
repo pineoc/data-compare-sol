@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <cmath>
+#include <algorithm>
 
 using namespace std;
 
@@ -53,6 +55,11 @@ public:
 	double raw_compare_formant();
 	double raw_compare_intensity();
 
+	//cosine compare functions
+	//return value:
+	//1		: same
+	//0		: no relation
+	//-1	: opposite
 	double cosine_compare_pitch();
 	double cosine_compare_formant();
 	double cosine_compare_intensity();
