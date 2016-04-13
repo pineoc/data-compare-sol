@@ -30,9 +30,9 @@ void compare::setPitchData()
 	//read from file standard pitch data
 	//start point check
 	bool start = false;
-	if (standardPitchFile.is_open()) 
+	if (standardPitchFile.is_open())
 	{
-		while (!standardPitchFile.eof()) 
+		while (!standardPitchFile.eof())
 		{
 			//file read
 			string time, point;
@@ -56,7 +56,7 @@ void compare::setPitchData()
 		}
 
 		//remove --undefined-- in the back
-		while (1) 
+		while (1)
 		{
 			if (standPitchVec.back() == 0)
 				standPitchVec.pop_back();
@@ -111,12 +111,59 @@ vector<double> compare::getPitchData()
 
 void compare::setFormantData()
 {
+	//read from file standard intensity data
 
+	if (standardFormantFile.is_open())
+	{
+		while (!standardFormantFile.eof())
+		{
+			//file read
+			string time, func1, func2, func3, func4;
+			standardFormantFile >> time >> func1 >> func2 >> func3 >> func4;
+
+			//set 0 - --undefined-- F0_Hz
+			if (!func1.compare("F1_Hz"))
+				continue;
+			!func1.compare("--undefined--") ? func1 = "0.0" : func1 = func1;
+			!func2.compare("--undefined--") ? func2 = "0.0" : func2 = func2;
+			!func3.compare("--undefined--") ? func3 = "0.0" : func3 = func3;
+			!func4.compare("--undefined--") ? func4 = "0.0" : func4 = func4;
+
+			standFormant1Vec.push_back(atof(func1.c_str()));
+			standFormant2Vec.push_back(atof(func2.c_str()));
+			standFormant3Vec.push_back(atof(func3.c_str()));
+			standFormant4Vec.push_back(atof(func4.c_str()));
+		}
+	}
+
+	//read from file compare pitch data
+	if (compFormantFile.is_open())
+	{
+		while (!compFormantFile.eof())
+		{
+			//file read
+			string time, func1, func2, func3, func4;
+			compFormantFile >> time >> func1 >> func2 >> func3 >> func4;
+
+			//set 0 - --undefined-- F0_Hz
+			if (!func1.compare("F1_Hz"))
+				continue;
+			!func1.compare("--undefined--") ? func1 = "0.0" : func1 = func1;
+			!func2.compare("--undefined--") ? func2 = "0.0" : func2 = func2;
+			!func3.compare("--undefined--") ? func3 = "0.0" : func3 = func3;
+			!func4.compare("--undefined--") ? func4 = "0.0" : func4 = func4;
+
+			compFormant1Vec.push_back(atof(func1.c_str()));
+			compFormant2Vec.push_back(atof(func2.c_str()));
+			compFormant3Vec.push_back(atof(func3.c_str()));
+			compFormant4Vec.push_back(atof(func4.c_str()));
+		}
+	}
 }
 
 vector<double> compare::getFormantData()
 {
-	return standFormantVec;
+	return standFormant1Vec;
 }
 
 void compare::setIntensityData()
@@ -211,7 +258,7 @@ double compare::raw_compare_pitch()
 			//male-10 < female < male+10 ? check similar.
 			if (abs(standPitchVec[pos] - compPitchVec[pos]) < RAW_PITCH_COMPARE_DIFF)
 				correctCnt++;
-			
+
 			pos++;
 		}
 		min--;
@@ -222,9 +269,49 @@ double compare::raw_compare_pitch()
 	return (double)correctCnt / (double)pos * 100;
 }
 
-double compare::raw_compare_formant()
+formantCompResultType compare::raw_compare_formant()
 {
-	return 0.0;
+	//read from file, set formant datas to vector
+	setFormantData();
+
+	//result data init
+	formantCompResultType result;
+	result.func1Res = 0.0;
+	result.func2Res = 0.0;
+	result.func3Res = 0.0;
+	result.func4Res = 0.0;
+
+	//compare start
+	/*compare two voice*/
+	//exist both data - compare
+	int correctCnt1 = 0, correctCnt2 = 0, correctCnt3 = 0, correctCnt4 = 0;
+	int vecLength = 0;
+
+	vecLength = min(compFormant1Vec.size(), standFormant1Vec.size());
+
+	//formant functions compare
+	for (int i = 0; i < vecLength; i++)
+	{
+		//function1 compare
+		if (abs(standFormant1Vec[i] - compFormant1Vec[i]) < RAW_FORMANT_COMPARE_DIFF)
+			correctCnt1++;
+		//function2 compare
+		if (abs(standFormant2Vec[i] - compFormant2Vec[i]) < RAW_FORMANT_COMPARE_DIFF)
+			correctCnt2++;
+		//function2 compare
+		if (abs(standFormant3Vec[i] - compFormant3Vec[i]) < RAW_FORMANT_COMPARE_DIFF)
+			correctCnt3++;
+		//function2 compare
+		if (abs(standFormant4Vec[i] - compFormant4Vec[i]) < RAW_FORMANT_COMPARE_DIFF)
+			correctCnt4++;
+	}
+
+	result.func1Res = (double)correctCnt1 / (double)vecLength * 100;
+	result.func2Res = (double)correctCnt2 / (double)vecLength * 100;
+	result.func3Res = (double)correctCnt3 / (double)vecLength * 100;
+	result.func4Res = (double)correctCnt4 / (double)vecLength * 100;
+
+	return result;
 }
 
 double compare::raw_compare_intensity()
@@ -232,35 +319,26 @@ double compare::raw_compare_intensity()
 	//intencity data push to vector
 	setIntensityData();
 
+	//compare start
 	/*compare two voice*/
 	//exist both data - compare
-	int pos = 0;
 	int correctCnt = 0;
 	int min = 0;
 	if (standIntencityVec.size() > compIntencityVec.size())
-	{
 		min = compIntencityVec.size();
-	}
 	else
-	{
 		min = standIntencityVec.size();
-	}
 
-	while (min > 0) {
-		while (standIntencityVec[pos] != 0 && compIntencityVec[pos] != 0)
-		{
-			//male-10 < female < male+10 ? check similar.
-			if (abs(standIntencityVec[pos] - compIntencityVec[pos]) < RAW_INTENSITY_COMPARE_DIFF)
-				correctCnt++;
-			
-			pos++;
-		}
-		min--;
+	for (int i = 0; i < min; i++)
+	{
+		//male-10 < female < male+10 ? check similar.
+		if (abs(standIntencityVec[i] - compIntencityVec[i]) < RAW_INTENSITY_COMPARE_DIFF)
+			correctCnt++;
 	}
 	//print corrected count, percent
 	//cout << "corrected count: " << correctCnt << endl;
 	//cout << "corrected percent: " << (double)correctCnt / (double)fSound * 100 << "%" << endl;
-	return (double)correctCnt / (double)pos * 100;
+	return (double)correctCnt / (double)min * 100;
 }
 
 double compare::cosine_compare_pitch()
@@ -284,12 +362,108 @@ double compare::cosine_compare_pitch()
 	}
 	bottomValue = sqrt(bottomVal1) * sqrt(bottomVal2);
 	similarityValue = topValue / bottomValue;
-	return similarityValue;
+	return similarityValue * 100;
 }
 
-double compare::cosine_compare_formant()
+formantCompResultType compare::cosine_compare_formant()
 {
-	return 0.0;
+	double similarityValue = 0.0;
+	double topValue = 0.0;
+	double bottomValue = 0.0;
+	double bottomVal1 = 0.0, bottomVal2 = 0.0;
+
+	//result data init
+	formantCompResultType result;
+	result.func1Res = 0.0;
+	result.func2Res = 0.0;
+	result.func3Res = 0.0;
+	result.func4Res = 0.0;
+
+	//vector length set
+	int vecLength = min(standFormant1Vec.size(), compFormant1Vec.size());
+
+	//formant function1 cosine similarity
+	//top value sum
+	for (int i = 0; i < vecLength; i++)
+		topValue += standFormant1Vec[i] * compFormant1Vec[i];
+
+	for (int i = 0; i < vecLength; i++)
+	{
+		bottomVal1 += pow(standFormant1Vec[i], 2);
+		bottomVal2 += pow(compFormant1Vec[i], 2);
+	}
+	bottomValue = sqrt(bottomVal1) * sqrt(bottomVal2);
+	similarityValue = topValue / bottomValue;
+
+	result.func1Res = similarityValue * 100;
+
+	//values set to 0.0
+	topValue = 0.0;
+	bottomVal1 = 0.0;
+	bottomVal2 = 0.0;
+	bottomValue = 0.0;
+	similarityValue = 0.0;
+
+	//formant function2 cosine similarity
+	//top value sum
+	for (int i = 0; i < vecLength; i++)
+		topValue += standFormant2Vec[i] * compFormant2Vec[i];
+
+	for (int i = 0; i < vecLength; i++)
+	{
+		bottomVal1 += pow(standFormant2Vec[i], 2);
+		bottomVal2 += pow(compFormant2Vec[i], 2);
+	}
+	bottomValue = sqrt(bottomVal1) * sqrt(bottomVal2);
+	similarityValue = topValue / bottomValue;
+
+	result.func2Res = similarityValue * 100;
+
+	//values set to 0.0
+	topValue = 0.0;
+	bottomVal1 = 0.0;
+	bottomVal2 = 0.0;
+	bottomValue = 0.0;
+	similarityValue = 0.0;
+
+	//formant function3 cosine similarity
+	//top value sum
+	for (int i = 0; i < vecLength; i++)
+		topValue += standFormant3Vec[i] * compFormant3Vec[i];
+
+	for (int i = 0; i < vecLength; i++)
+	{
+		bottomVal1 += pow(standFormant3Vec[i], 2);
+		bottomVal2 += pow(compFormant3Vec[i], 2);
+	}
+	bottomValue = sqrt(bottomVal1) * sqrt(bottomVal2);
+	similarityValue = topValue / bottomValue;
+
+	result.func3Res = similarityValue * 100;
+
+	//values set to 0.0
+	topValue = 0.0;
+	bottomVal1 = 0.0;
+	bottomVal2 = 0.0;
+	bottomValue = 0.0;
+	similarityValue = 0.0;
+
+	//formant function4 cosine similarity
+	//top value sum
+	for (int i = 0; i < vecLength; i++)
+		topValue += standFormant4Vec[i] * compFormant4Vec[i];
+
+	for (int i = 0; i < vecLength; i++)
+	{
+		bottomVal1 += pow(standFormant4Vec[i], 2);
+		bottomVal2 += pow(compFormant4Vec[i], 2);
+	}
+	bottomValue = sqrt(bottomVal1) * sqrt(bottomVal2);
+	similarityValue = topValue / bottomValue;
+
+	result.func4Res = similarityValue * 100;
+
+	return result;
 }
 
 double compare::cosine_compare_intensity()
@@ -313,5 +487,5 @@ double compare::cosine_compare_intensity()
 	}
 	bottomValue = sqrt(bottomVal1) * sqrt(bottomVal2);
 	similarityValue = topValue / bottomValue;
-	return similarityValue;
+	return similarityValue * 100;
 }
