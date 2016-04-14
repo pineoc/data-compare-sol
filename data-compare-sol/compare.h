@@ -76,5 +76,10 @@ public:
 	double cosine_compare_pitch();
 	formantCompResultType cosine_compare_formant();
 	double cosine_compare_intensity();
+
+	//Euclidean distance
+	double euclidean_compare_pitch();
+	formantCompResultType euclidean_compare_formant();
+	double euclidean_compare_intensity();
 };
 

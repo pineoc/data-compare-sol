@@ -489,3 +489,40 @@ double compare::cosine_compare_intensity()
 	similarityValue = topValue / bottomValue;
 	return similarityValue * 100;
 }
+
+double compare::euclidean_compare_pitch()
+{
+	double value1 = 0.0;
+	double result = 0.0;
+
+	int vecLength = min(standPitchVec.size(), compPitchVec.size());
+
+	//sum of pow2, (p-q)^2
+	for (int i = 0; i < vecLength; i++)
+		value1 += pow((standPitchVec[i] - compPitchVec[i]), 2);
+
+	result = sqrt(value1);
+	result = 1.0 / (1.0 + result) * 100;
+	return result;
+}
+
+formantCompResultType compare::euclidean_compare_formant()
+{
+	return formantCompResultType();
+}
+
+double compare::euclidean_compare_intensity()
+{
+	double value1 = 0.0;
+	double result = 0.0;
+
+	int vecLength = min(standIntencityVec.size(), compIntencityVec.size());
+
+	//sum of pow2, (p-q)^2
+	for (int i = 0; i < vecLength; i++)
+		value1 += pow((standIntencityVec[i] - compIntencityVec[i]), 2);
+
+	result = sqrt(value1);
+
+	return 1.0 / (1.0 + result) * 100;
+}
