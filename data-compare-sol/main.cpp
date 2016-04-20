@@ -4,7 +4,11 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	compare* oCompare = new compare("datas/song1f", "datas/song1m");
+	string file1 = "datas/person-data/leeyunseok1";
+	string file2 = "datas/person-data/leeyunseok-record";
+	compare* oCompare = new compare(file1, file2);
+	cout << "Compare program" << endl << "file1 name: " << file1 << endl;
+	cout<< "file2 name: " << file2 << endl;
 	cout << "===========raw similarity check===============" << endl;
 	cout << "raw compare pitch: " << oCompare->raw_compare_pitch() << endl;
 	cout << "raw compare intensity: " << oCompare->raw_compare_intensity() << endl;
