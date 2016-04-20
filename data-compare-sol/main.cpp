@@ -4,6 +4,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
+	//file name will need ,argv[1], argv[2]
 	string file1 = "./datas/person-data/leeyunseok1";
 	string file2 = "./datas/person-data/leeyunseok-record";
 	compare* oCompare = new compare(file1, file2);
