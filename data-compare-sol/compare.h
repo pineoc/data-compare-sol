@@ -9,8 +9,15 @@
 using namespace std;
 
 #define RAW_PITCH_COMPARE_DIFF 5.0f
-#define RAW_FORMANT_COMPARE_DIFF 5.0f
+#define RAW_FORMANT_COMPARE_DIFF 20.0f
 #define RAW_INTENSITY_COMPARE_DIFF 5.0f
+
+struct formantCompResultType {
+	double func1Res;
+	double func2Res;
+	double func3Res;
+	double func4Res;
+};
 
 class compare
 {
@@ -21,7 +28,10 @@ private:
 	ifstream standardIntensityFile;
 
 	vector<double> standPitchVec;
-	vector<double> standFormantVec;
+	vector<double> standFormant1Vec;
+	vector<double> standFormant2Vec;
+	vector<double> standFormant3Vec;
+	vector<double> standFormant4Vec;
 	vector<double> standIntencityVec;
 
 	//compare audio data file
@@ -30,7 +40,10 @@ private:
 	ifstream compIntensityFile;
 
 	vector<double> compPitchVec;
-	vector<double> compFormantVec;
+	vector<double> compFormant1Vec;
+	vector<double> compFormant2Vec;
+	vector<double> compFormant3Vec;
+	vector<double> compFormant4Vec;
 	vector<double> compIntencityVec;
 
 public:
@@ -52,7 +65,7 @@ public:
 
 	//raw compare functions
 	double raw_compare_pitch();
-	double raw_compare_formant();
+	formantCompResultType raw_compare_formant();
 	double raw_compare_intensity();
 
 	//cosine compare functions
@@ -61,7 +74,12 @@ public:
 	//0		: no relation
 	//-1	: opposite
 	double cosine_compare_pitch();
-	double cosine_compare_formant();
+	formantCompResultType cosine_compare_formant();
 	double cosine_compare_intensity();
+
+	//Euclidean distance
+	double euclidean_compare_pitch();
+	formantCompResultType euclidean_compare_formant();
+	double euclidean_compare_intensity();
 };
 
