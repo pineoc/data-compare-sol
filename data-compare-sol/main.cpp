@@ -4,7 +4,7 @@ using namespace std;
 
 int main(int argc, char* argv[])
 {
-	compare* oCompare = new compare("datas/song1m", "datas/song1f");
+	compare* oCompare = new compare(argv[1], argv[2]);
 	cout << "===========raw similarity check===============" << endl;
 	cout << "raw compare pitch: " << oCompare->raw_compare_pitch() << endl;
 	cout << "raw compare intensity: " << oCompare->raw_compare_intensity() << endl;
