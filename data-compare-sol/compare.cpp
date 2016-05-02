@@ -10,14 +10,14 @@ intencity file	: "name-i"
 compare::compare(string standardDataFilename, string compareDataFilename)
 {
 	//standard file open
-	standardPitchFile = ifstream(string(standardDataFilename + "-p"));
-	standardFormantFile = ifstream(string(standardDataFilename + "-f"));
-	standardIntensityFile = ifstream(string(standardDataFilename + "-i"));
+	standardPitchFile = ifstream(string(standardDataFilename + "-p.out"));
+	standardFormantFile = ifstream(string(standardDataFilename + "-f.out"));
+	standardIntensityFile = ifstream(string(standardDataFilename + "-i.out"));
 
 	//compare file open
-	compPitchFile = ifstream(string(compareDataFilename + "-p"));
-	compFormantFile = ifstream(string(compareDataFilename + "-f"));
-	compIntensityFile = ifstream(string(compareDataFilename + "-i"));
+	compPitchFile = ifstream(string(compareDataFilename + "-p.out"));
+	compFormantFile = ifstream(string(compareDataFilename + "-f.out"));
+	compIntensityFile = ifstream(string(compareDataFilename + "-i.out"));
 }
 
 
