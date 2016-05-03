@@ -49,9 +49,16 @@ int main(int argc, char* argv[])
 		oCompare->setIntensityData();
 		oCompare->setPitchData();
 		//print to stdout
-		cout << "{ \"pitch_rate\": " << oCompare->cosine_compare_pitch() << ",";
-		cout << "\"int_rate\": " << oCompare->cosine_compare_intensity() << "}";		
-	}
+		double cosine_pitch_rate = oCompare->cosine_compare_pitch();
+		double cosine_int_rate = oCompare->cosine_compare_intensity();
+		if (isnan(cosine_pitch_rate))
+			cosine_pitch_rate = 0.0;
+		if (isnan(cosine_int_rate))
+			cosine_int_rate = 0.0;
+		cout << "{ \"pitch_rate\": " << cosine_pitch_rate << ",";
+		cout << "\"int_rate\": " << cosine_int_rate << "}";
+	}
+
 
 
 	return 0;
