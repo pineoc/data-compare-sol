@@ -39,7 +39,7 @@ void compare::setPitchData()
 			standardPitchFile >> time >> point;
 
 			//set 0 - --undefined-- F0_Hz
-			if (!point.compare("--undefined--") || !point.compare("F0_Hz"))
+			if (!point.compare("--undefined--") || !point.compare("pitch"))
 			{
 				point = "0";
 			}
@@ -77,7 +77,7 @@ void compare::setPitchData()
 			compPitchFile >> time >> point;
 
 			//set 0 - --undefined-- F0_Hz
-			if (!point.compare("--undefined--") || !point.compare("F0_Hz"))
+			if (!point.compare("--undefined--") || !point.compare("pitch"))
 			{
 				point = "0";
 			}
@@ -118,21 +118,17 @@ void compare::setFormantData()
 		while (!standardFormantFile.eof())
 		{
 			//file read
-			string time, func1, func2, func3, func4;
-			standardFormantFile >> time >> func1 >> func2 >> func3 >> func4;
+			string time, func2, func3;
+			standardFormantFile >> time >> func2 >> func3;
 
 			//set 0 - --undefined-- F0_Hz
-			if (!func1.compare("F1_Hz"))
+			if (!func2.compare("f2"))
 				continue;
-			!func1.compare("--undefined--") ? func1 = "0.0" : func1 = func1;
 			!func2.compare("--undefined--") ? func2 = "0.0" : func2 = func2;
 			!func3.compare("--undefined--") ? func3 = "0.0" : func3 = func3;
-			!func4.compare("--undefined--") ? func4 = "0.0" : func4 = func4;
 
-			standFormant1Vec.push_back(atof(func1.c_str()));
 			standFormant2Vec.push_back(atof(func2.c_str()));
 			standFormant3Vec.push_back(atof(func3.c_str()));
-			standFormant4Vec.push_back(atof(func4.c_str()));
 		}
 	}
 
@@ -142,28 +138,24 @@ void compare::setFormantData()
 		while (!compFormantFile.eof())
 		{
 			//file read
-			string time, func1, func2, func3, func4;
-			compFormantFile >> time >> func1 >> func2 >> func3 >> func4;
+			string time, func2, func3;
+			compFormantFile >> time >> func2 >> func3;
 
 			//set 0 - --undefined-- F0_Hz
-			if (!func1.compare("F1_Hz"))
+			if (!func2.compare("f2"))
 				continue;
-			!func1.compare("--undefined--") ? func1 = "0.0" : func1 = func1;
 			!func2.compare("--undefined--") ? func2 = "0.0" : func2 = func2;
 			!func3.compare("--undefined--") ? func3 = "0.0" : func3 = func3;
-			!func4.compare("--undefined--") ? func4 = "0.0" : func4 = func4;
 
-			compFormant1Vec.push_back(atof(func1.c_str()));
 			compFormant2Vec.push_back(atof(func2.c_str()));
 			compFormant3Vec.push_back(atof(func3.c_str()));
-			compFormant4Vec.push_back(atof(func4.c_str()));
 		}
 	}
 }
 
 vector<double> compare::getFormantData()
 {
-	return standFormant1Vec;
+	return standFormant2Vec;
 }
 
 void compare::setIntensityData()
@@ -180,7 +172,7 @@ void compare::setIntensityData()
 			standardIntensityFile >> time >> point;
 
 			//set 0 - --undefined-- F0_Hz
-			if (!point.compare("--undefined--") || !point.compare("Intensity_dB"))
+			if (!point.compare("--undefined--") || !point.compare("intensity"))
 			{
 				point = "0";
 			}
@@ -210,7 +202,7 @@ void compare::setIntensityData()
 			compIntensityFile >> time >> point;
 
 			//set 0 - --undefined-- F0_Hz
-			if (!point.compare("--undefined--") || !point.compare("Intensity_dB"))
+			if (!point.compare("--undefined--") || !point.compare("intensity"))
 			{
 				point = "0";
 			}
@@ -276,40 +268,32 @@ formantCompResultType compare::raw_compare_formant()
 
 	//result data init
 	formantCompResultType result;
-	result.func1Res = 0.0;
 	result.func2Res = 0.0;
 	result.func3Res = 0.0;
-	result.func4Res = 0.0;
 
 	//compare start
 	/*compare two voice*/
 	//exist both data - compare
-	int correctCnt1 = 0, correctCnt2 = 0, correctCnt3 = 0, correctCnt4 = 0;
+	int correctCnt2 = 0, correctCnt3 = 0;
 	int vecLength = 0;
 
-	vecLength = min(compFormant1Vec.size(), standFormant1Vec.size());
+	vecLength = min(compFormant2Vec.size(), standFormant2Vec.size());
 
 	//formant functions compare
 	for (int i = 0; i < vecLength; i++)
 	{
-		//function1 compare
-		if (abs(standFormant1Vec[i] - compFormant1Vec[i]) < RAW_FORMANT_COMPARE_DIFF)
-			correctCnt1++;
+		
 		//function2 compare
 		if (abs(standFormant2Vec[i] - compFormant2Vec[i]) < RAW_FORMANT_COMPARE_DIFF)
 			correctCnt2++;
-		//function2 compare
+		//function3 compare
 		if (abs(standFormant3Vec[i] - compFormant3Vec[i]) < RAW_FORMANT_COMPARE_DIFF)
 			correctCnt3++;
-		//function2 compare
-		if (abs(standFormant4Vec[i] - compFormant4Vec[i]) < RAW_FORMANT_COMPARE_DIFF)
-			correctCnt4++;
+		
 	}
 
-	result.func1Res = (double)correctCnt1 / (double)vecLength * 100;
 	result.func2Res = (double)correctCnt2 / (double)vecLength * 100;
 	result.func3Res = (double)correctCnt3 / (double)vecLength * 100;
-	result.func4Res = (double)correctCnt4 / (double)vecLength * 100;
 
 	return result;
 }
@@ -374,28 +358,12 @@ formantCompResultType compare::cosine_compare_formant()
 
 	//result data init
 	formantCompResultType result;
-	result.func1Res = 0.0;
 	result.func2Res = 0.0;
 	result.func3Res = 0.0;
-	result.func4Res = 0.0;
 
 	//vector length set
-	int vecLength = min(standFormant1Vec.size(), compFormant1Vec.size());
+	int vecLength = min(standFormant2Vec.size(), compFormant2Vec.size());
 
-	//formant function1 cosine similarity
-	//top value sum
-	for (int i = 0; i < vecLength; i++)
-		topValue += standFormant1Vec[i] * compFormant1Vec[i];
-
-	for (int i = 0; i < vecLength; i++)
-	{
-		bottomVal1 += pow(standFormant1Vec[i], 2);
-		bottomVal2 += pow(compFormant1Vec[i], 2);
-	}
-	bottomValue = sqrt(bottomVal1) * sqrt(bottomVal2);
-	similarityValue = topValue / bottomValue;
-
-	result.func1Res = similarityValue * 100;
 
 	//values set to 0.0
 	topValue = 0.0;
@@ -440,28 +408,6 @@ formantCompResultType compare::cosine_compare_formant()
 	similarityValue = topValue / bottomValue;
 
 	result.func3Res = similarityValue * 100;
-
-	//values set to 0.0
-	topValue = 0.0;
-	bottomVal1 = 0.0;
-	bottomVal2 = 0.0;
-	bottomValue = 0.0;
-	similarityValue = 0.0;
-
-	//formant function4 cosine similarity
-	//top value sum
-	for (int i = 0; i < vecLength; i++)
-		topValue += standFormant4Vec[i] * compFormant4Vec[i];
-
-	for (int i = 0; i < vecLength; i++)
-	{
-		bottomVal1 += pow(standFormant4Vec[i], 2);
-		bottomVal2 += pow(compFormant4Vec[i], 2);
-	}
-	bottomValue = sqrt(bottomVal1) * sqrt(bottomVal2);
-	similarityValue = topValue / bottomValue;
-
-	result.func4Res = similarityValue * 100;
 
 	return result;
 }

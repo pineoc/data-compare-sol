@@ -13,10 +13,8 @@ using namespace std;
 #define RAW_INTENSITY_COMPARE_DIFF 5.0f
 
 struct formantCompResultType {
-	double func1Res;
 	double func2Res;
 	double func3Res;
-	double func4Res;
 };
 
 class compare
@@ -28,10 +26,8 @@ private:
 	ifstream standardIntensityFile;
 
 	vector<double> standPitchVec;
-	vector<double> standFormant1Vec;
 	vector<double> standFormant2Vec;
 	vector<double> standFormant3Vec;
-	vector<double> standFormant4Vec;
 	vector<double> standIntencityVec;
 
 	//compare audio data file
@@ -40,10 +36,8 @@ private:
 	ifstream compIntensityFile;
 
 	vector<double> compPitchVec;
-	vector<double> compFormant1Vec;
 	vector<double> compFormant2Vec;
 	vector<double> compFormant3Vec;
-	vector<double> compFormant4Vec;
 	vector<double> compIntencityVec;
 
 public:
