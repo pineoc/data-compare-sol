@@ -10,11 +10,17 @@ int main(int argc, char* argv[])
 		argv3 = string(argv[3]);
 
 	if (argv3 == "")
-	{ // test dev version sequence
+	{ // cpp test dev version sequence
 		string dir = "C:/Users/test/Documents/GitHub/Attend-Speaker/sound-data/";
 		string file1 = dir + "ÀÌÀ±¼®12111603/ÀÌÀ±¼®1.wav";
 		string file2 = dir + "leeyunseok12111603/leeyunseok1.wav";
+
 		compare* oCompare = new compare(file1, file2);
+
+		//set data to array
+		oCompare->setFormantData();
+		oCompare->setIntensityData();
+		oCompare->setPitchData();
 
 		cout << "===========raw similarity check===============" << endl;
 		cout << "raw compare pitch: " << oCompare->raw_compare_pitch() << endl;

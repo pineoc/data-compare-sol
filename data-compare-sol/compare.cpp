@@ -228,8 +228,6 @@ vector<double> compare::getIntensityData()
 
 double compare::raw_compare_pitch()
 {
-	//pitch data push to vector
-	setPitchData();
 	/*compare two voice*/
 	//exist both data - compare
 	int pos = 0;
@@ -263,8 +261,6 @@ double compare::raw_compare_pitch()
 
 formantCompResultType compare::raw_compare_formant()
 {
-	//read from file, set formant datas to vector
-	setFormantData();
 
 	//result data init
 	formantCompResultType result;
@@ -300,9 +296,6 @@ formantCompResultType compare::raw_compare_formant()
 
 double compare::raw_compare_intensity()
 {
-	//intencity data push to vector
-	setIntensityData();
-
 	//compare start
 	/*compare two voice*/
 	//exist both data - compare
