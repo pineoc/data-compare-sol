@@ -11,6 +11,7 @@ int main(int argc, char* argv[])
 
 	if (argv3 == "")
 	{ // cpp test dev version sequence
+		//you should register two data and update this strings
 		string dir = "C:/Users/test/Documents/GitHub/Attend-Speaker/sound-data/";
 		string file1 = dir + "¿Ã¿±ºÆ12111603/¿Ã¿±ºÆ1.wav";
 		string file2 = dir + "leeyunseok12111603/leeyunseok1.wav";
