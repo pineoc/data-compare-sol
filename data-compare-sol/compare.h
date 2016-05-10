@@ -8,6 +8,8 @@
 
 using namespace std;
 
+#include "dataList.h"
+
 #define RAW_PITCH_COMPARE_DIFF 5.0f
 #define RAW_FORMANT_COMPARE_DIFF 20.0f
 #define RAW_INTENSITY_COMPARE_DIFF 5.0f
@@ -75,5 +77,8 @@ public:
 	double euclidean_compare_pitch();
 	formantCompResultType euclidean_compare_formant();
 	double euclidean_compare_intensity();
+
+	//DataList logic functions
+	void makeDataList();
 };
 

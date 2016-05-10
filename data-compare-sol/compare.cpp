@@ -3,12 +3,13 @@
 /*
 compare class init
 file name
-pitch file		: "name-p"
-formant file	: "name-f"
-intencity file	: "name-i"
+pitch file		: "name-p.out"
+formant file	: "name-f.out"
+intencity file	: "name-i.out"
 */
 compare::compare(string standardDataFilename, string compareDataFilename)
 {
+	//set file to vector
 	//standard file open
 	standardPitchFile = ifstream(string(standardDataFilename + "-p.out"));
 	standardFormantFile = ifstream(string(standardDataFilename + "-f.out"));
@@ -38,21 +39,18 @@ void compare::setPitchData()
 			string time, point;
 			standardPitchFile >> time >> point;
 
-			//set 0 - --undefined-- F0_Hz
-			if (!point.compare("--undefined--") || !point.compare("pitch"))
+			//if pitch
+			if (!point.compare("pitch"))
+				continue;
+
+			if (!point.compare("--undefined--"))
 			{
 				point = "0";
 			}
 
-			if (point != "0")
-			{
-				start = true;
-			}
-			//store after start
-			if (start)
-			{
-				standPitchVec.push_back(atof(point.c_str()));
-			}
+			//push to vector
+			standPitchVec.push_back(atof(point.c_str()));
+			
 		}
 
 		//remove --undefined-- in the back
@@ -76,21 +74,18 @@ void compare::setPitchData()
 			string time, point;
 			compPitchFile >> time >> point;
 
-			//set 0 - --undefined-- F0_Hz
-			if (!point.compare("--undefined--") || !point.compare("pitch"))
+			//set 0 - --undefined-- pitch
+			//if pitch
+			if (!point.compare("pitch"))
+				continue;
+
+			if (!point.compare("--undefined--"))
 			{
 				point = "0";
 			}
 
-			if (point != "0")
-			{
-				start = true;
-			}
-			//store after start
-			if (start)
-			{
-				compPitchVec.push_back(atof(point.c_str()));
-			}
+			//push to vector
+			compPitchVec.push_back(atof(point.c_str()));
 		}
 
 		//remove --undefined-- in the back
@@ -121,7 +116,7 @@ void compare::setFormantData()
 			string time, func2, func3;
 			standardFormantFile >> time >> func2 >> func3;
 
-			//set 0 - --undefined-- F0_Hz
+			//set 0 - --undefined-- f2
 			if (!func2.compare("f2"))
 				continue;
 			!func2.compare("--undefined--") ? func2 = "0.0" : func2 = func2;
@@ -141,7 +136,7 @@ void compare::setFormantData()
 			string time, func2, func3;
 			compFormantFile >> time >> func2 >> func3;
 
-			//set 0 - --undefined-- F0_Hz
+			//set 0 - --undefined-- f2
 			if (!func2.compare("f2"))
 				continue;
 			!func2.compare("--undefined--") ? func2 = "0.0" : func2 = func2;
@@ -171,7 +166,7 @@ void compare::setIntensityData()
 			string time, point;
 			standardIntensityFile >> time >> point;
 
-			//set 0 - --undefined-- F0_Hz
+			//set 0 - --undefined-- intensity
 			if (!point.compare("--undefined--") || !point.compare("intensity"))
 			{
 				point = "0";
@@ -201,7 +196,7 @@ void compare::setIntensityData()
 			string time, point;
 			compIntensityFile >> time >> point;
 
-			//set 0 - --undefined-- F0_Hz
+			//set 0 - --undefined-- intensity
 			if (!point.compare("--undefined--") || !point.compare("intensity"))
 			{
 				point = "0";
@@ -253,9 +248,7 @@ double compare::raw_compare_pitch()
 		}
 		min--;
 	}
-	//print corrected count, percent
-	//cout << "corrected count: " << correctCnt << endl;
-	//cout << "corrected percent: " << (double)correctCnt / (double)fSound * 100 << "%" << endl;
+	//return corrected count, percent
 	return (double)correctCnt / (double)pos * 100;
 }
 
@@ -312,9 +305,7 @@ double compare::raw_compare_intensity()
 		if (abs(standIntencityVec[i] - compIntencityVec[i]) < RAW_INTENSITY_COMPARE_DIFF)
 			correctCnt++;
 	}
-	//print corrected count, percent
-	//cout << "corrected count: " << correctCnt << endl;
-	//cout << "corrected percent: " << (double)correctCnt / (double)fSound * 100 << "%" << endl;
+	//return corrected count, percent
 	return (double)correctCnt / (double)min * 100;
 }
 
@@ -464,4 +455,12 @@ double compare::euclidean_compare_intensity()
 	result = sqrt(value1);
 
 	return 1.0 / (1.0 + result) * 100;
+}
+
+void compare::makeDataList()
+{
+	dataList* standDL = new dataList(standPitchVec, standFormant2Vec, standFormant3Vec, standIntencityVec);
+	dataList* compDL = new dataList(compPitchVec, compFormant2Vec, compFormant3Vec, compIntencityVec);
+
+	cout << "" << endl;
 }

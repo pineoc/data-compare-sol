@@ -22,6 +22,22 @@ private:
 	vector<double> intensityVec;
 public:
 	Data();
+	Data(vector<double> pitchV, vector<double> f2V, vector<double> f3v, vector<double> intV);
 	~Data();
+	
+	void setDataLength(int len);
+	int getDataLength();
+
+	void setPitchVec(vector<double> v);
+	vector<double> getPitchVec();
+
+	void setFormant2Vec(vector<double> v);
+	vector<double> getFormant2Vec();
+
+	void setFormant3Vec(vector<double> v);
+	vector<double> getFormant3Vec();
+
+	void setIntVec(vector<double> v);
+	vector<double> getIntVec();
 };
 

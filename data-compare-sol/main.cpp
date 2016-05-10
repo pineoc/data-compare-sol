@@ -12,9 +12,9 @@ int main(int argc, char* argv[])
 	if (argv3 == "")
 	{ // cpp test dev version sequence
 		//you should register two data and update this strings
-		string dir = "C:/Users/test/Documents/GitHub/Attend-Speaker/sound-data/";
-		string file1 = dir + "¿Ã¿±ºÆ12111603/¿Ã¿±ºÆ1.wav";
-		string file2 = dir + "leeyunseok12111603/leeyunseok1.wav";
+		string dir = "";
+		string file1 = dir + "test1/test1_1.wav";
+		string file2 = dir + "test2/test2.wav";
 
 		compare* oCompare = new compare(file1, file2);
 
@@ -39,6 +39,9 @@ int main(int argc, char* argv[])
 		cout << "func2: " << oCompare->cosine_compare_formant().func2Res << endl;
 		cout << "func3: " << oCompare->cosine_compare_formant().func3Res << endl;
 		cout << endl;
+
+		//test make data list
+		oCompare->makeDataList();
 
 	}
 	else
