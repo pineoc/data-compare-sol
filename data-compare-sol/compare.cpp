@@ -209,7 +209,7 @@ void compare::setIntensityData()
 			//store after start
 			if (start)
 			{
-				compIntencityVec.push_back(atof(point.c_str()));
+				compIntensityVec.push_back(atof(point.c_str()));
 			}
 		}
 
@@ -294,15 +294,15 @@ double compare::raw_compare_intensity()
 	//exist both data - compare
 	int correctCnt = 0;
 	int min = 0;
-	if (standIntencityVec.size() > compIntencityVec.size())
-		min = compIntencityVec.size();
+	if (standIntencityVec.size() > compIntensityVec.size())
+		min = compIntensityVec.size();
 	else
 		min = standIntencityVec.size();
 
 	for (int i = 0; i < min; i++)
 	{
 		//male-10 < female < male+10 ? check similar.
-		if (abs(standIntencityVec[i] - compIntencityVec[i]) < RAW_INTENSITY_COMPARE_DIFF)
+		if (abs(standIntencityVec[i] - compIntensityVec[i]) < RAW_INTENSITY_COMPARE_DIFF)
 			correctCnt++;
 	}
 	//return corrected count, percent
@@ -404,22 +404,22 @@ double compare::cosine_compare_intensity()
 	double bottomVal1 = 0.0, bottomVal2 = 0.0;
 
 	//vector length set
-	int vecLength = min(standIntencityVec.size(), compIntencityVec.size());
+	int vecLength = min(standIntencityVec.size(), compIntensityVec.size());
 
 	//top value sum
 	for (int i = 0; i < vecLength; i++)
-		topValue += standIntencityVec[i] * compIntencityVec[i];
+		topValue += standIntencityVec[i] * compIntensityVec[i];
 
 	for (int i = 0; i < vecLength; i++)
 	{
 		bottomVal1 += pow(standIntencityVec[i], 2);
-		bottomVal2 += pow(compIntencityVec[i], 2);
+		bottomVal2 += pow(compIntensityVec[i], 2);
 	}
 	bottomValue = sqrt(bottomVal1) * sqrt(bottomVal2);
 	similarityValue = topValue / bottomValue;
 	return similarityValue * 100;
 }
-
+/*
 double compare::euclidean_compare_pitch()
 {
 	double value1 = 0.0;
@@ -456,11 +456,78 @@ double compare::euclidean_compare_intensity()
 
 	return 1.0 / (1.0 + result) * 100;
 }
+*/
+
+void compare::median_function()
+{
+	double filter[5];
+	vector<double> tmpVec;
+	tmpVec.assign(compPitchVec.size(), 0.0);
+
+	//pitch vector median
+	for (int i = 0; i < compPitchVec.size() - 4; i++)
+	{
+		filter[0] = compPitchVec[i];
+		filter[1] = compPitchVec[i + 1];
+		filter[2] = compPitchVec[i + 2];
+		filter[3] = compPitchVec[i + 3];
+		filter[4] = compPitchVec[i + 4];
+
+		sort(filter, filter + 5);
+		tmpVec[i + 2] = filter[2];
+	}
+	compPitchVec = tmpVec;
+	
+	//intensity median
+	tmpVec.clear();
+	tmpVec.assign(compIntensityVec.size(), 0.0);
+	for (int i = 0; i < compIntensityVec.size() - 4; i++)
+	{
+		filter[0] = compIntensityVec[i];
+		filter[1] = compIntensityVec[i + 1];
+		filter[2] = compIntensityVec[i + 2];
+		filter[3] = compIntensityVec[i + 3];
+		filter[4] = compIntensityVec[i + 4];
+
+		sort(filter, filter + 5);
+		tmpVec[i + 2] = filter[2];
+	}
+	compIntensityVec = tmpVec;
+
+
+	//f2 median
+	tmpVec.clear();
+	tmpVec.assign(compFormant2Vec.size(), 0.0);
+	for (int i = 0; i < compFormant2Vec.size() - 2; i++)
+	{
+		filter[0] = compFormant2Vec[i];
+		filter[1] = compFormant2Vec[i + 1];
+		filter[2] = compFormant2Vec[i + 2];
+
+		sort(filter, filter + 3);
+		tmpVec[i + 1] = filter[1];
+	}
+	compFormant2Vec = tmpVec;
+
+	//f3 median
+	tmpVec.clear();
+	tmpVec.assign(compFormant3Vec.size(), 0.0);
+	for (int i = 0; i < compFormant3Vec.size() - 2; i++)
+	{
+		filter[0] = compFormant3Vec[i];
+		filter[1] = compFormant3Vec[i + 1];
+		filter[2] = compFormant3Vec[i + 2];
+		
+		sort(filter, filter + 3);
+		tmpVec[i + 1] = filter[1];
+	}
+	compFormant3Vec = tmpVec;
+}
 
 void compare::makeDataList()
 {
 	dataList* standDL = new dataList(standPitchVec, standFormant2Vec, standFormant3Vec, standIntencityVec);
-	dataList* compDL = new dataList(compPitchVec, compFormant2Vec, compFormant3Vec, compIntencityVec);
+	dataList* compDL = new dataList(compPitchVec, compFormant2Vec, compFormant3Vec, compIntensityVec);
 
 	cout << "" << endl;
 }

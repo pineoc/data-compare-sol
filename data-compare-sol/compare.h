@@ -40,7 +40,7 @@ private:
 	vector<double> compPitchVec;
 	vector<double> compFormant2Vec;
 	vector<double> compFormant3Vec;
-	vector<double> compIntencityVec;
+	vector<double> compIntensityVec;
 
 public:
 	//init compare object
@@ -74,9 +74,11 @@ public:
 	double cosine_compare_intensity();
 
 	//Euclidean distance
-	double euclidean_compare_pitch();
-	formantCompResultType euclidean_compare_formant();
-	double euclidean_compare_intensity();
+	//double euclidean_compare_pitch();
+	//formantCompResultType euclidean_compare_formant();
+	//double euclidean_compare_intensity();
+
+	void median_function();
 
 	//DataList logic functions
 	void makeDataList();

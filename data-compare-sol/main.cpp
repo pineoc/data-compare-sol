@@ -40,6 +40,8 @@ int main(int argc, char* argv[])
 		cout << "func3: " << oCompare->cosine_compare_formant().func3Res << endl;
 		cout << endl;
 
+		oCompare->median_function();
+
 		//test make data list
 		oCompare->makeDataList();
 
