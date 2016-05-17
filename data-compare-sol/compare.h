@@ -78,7 +78,11 @@ public:
 	//formantCompResultType euclidean_compare_formant();
 	//double euclidean_compare_intensity();
 
+	//median filtering
 	void median_function();
+
+	//cmompare pitch average
+	double pitch_average_compare();
 
 	//DataList logic functions
 	void makeDataList();

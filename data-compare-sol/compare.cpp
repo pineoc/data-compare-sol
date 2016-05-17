@@ -531,3 +531,30 @@ void compare::makeDataList()
 
 	cout << "" << endl;
 }
+
+//cmompare pitch average
+double compare::pitch_average_compare()
+{
+	//averages
+	double std_pitch_average = 0;
+	double cmp_pitch_average = 0;
+
+	//get standard pitch averages
+	for (int i = 0; i < standPitchVec.size(); i++)
+	{
+		std_pitch_average += standPitchVec[i];
+	}
+
+	std_pitch_average = (std_pitch_average / standPitchVec.size());
+
+	//get compared pitch averages
+	for (int i = 0; i < compPitchVec.size(); i++)
+	{
+		cmp_pitch_average += standPitchVec[i];
+	}
+
+	cmp_pitch_average = (cmp_pitch_average / compPitchVec.size());
+
+	//correctness
+	return (cmp_pitch_average / std_pitch_average) * 100;
+}
