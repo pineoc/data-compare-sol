@@ -5,25 +5,31 @@ dataList::dataList(vector<double> pitchV, vector<double> f2V, vector<double> f3V
 {
 	//make data list of data node
 	//using vector stream
+
+	double int_avg = 0.0;
+	//get intensity average value
+	for (int i = 2; i < intV.size() - 2; i++)
+		int_avg += intV[i];
+	int_avg = int_avg / (double)(intV.size() - 4);
 	
-	for (int i = 0; i < pitchV.size(); i++)
+	for (int i = 0; i < intV.size(); i++)
 	{
 		//data block start
-		if (pitchV[i] > 0.0)
+		if (intV[i] > int_avg)
 		{
 			Data d;
 			vector<double> pitchBlock;
 			vector<double> f2Block;
 			vector<double> f3Block;
 			vector<double> intBlock;
-			while (pitchV[i] > 0)
+			while (intV[i] > int_avg)
 			{
 				pitchBlock.push_back(pitchV[i]);
 				f2Block.push_back(f2V[i]);
 				f3Block.push_back(f3V[i]);
 				intBlock.push_back(intV[i]);
 				i++;
-				if (pitchV.size() == i)
+				if (intV.size() == i)
 					break;
 			}
 			d.setPitchVec(pitchBlock);

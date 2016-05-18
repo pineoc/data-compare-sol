@@ -89,4 +89,3 @@ public:
 	vector<double> interpolation(vector<double> blk_stand, vector<double> blk_comp);
 	double round(double value);
 };
-
