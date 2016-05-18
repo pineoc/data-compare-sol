@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 	{ // cpp test dev version sequence
 		//you should register two data and update this strings
 		string dir = "";
-		string file1 = dir + "test1/test1_1.wav";
+		string file1 = dir + "test4/test4.wav";
 		string file2 = dir + "test3/test3.wav";
 
 		compare* oCompare = new compare(file1, file2);
