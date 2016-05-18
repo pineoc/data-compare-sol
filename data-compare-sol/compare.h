@@ -86,5 +86,7 @@ public:
 
 	//DataList logic functions
 	void makeDataList();
+	vector<double> interpolation(vector<double> blk_stand, vector<double> blk_comp);
+	double round(double value);
 };
 

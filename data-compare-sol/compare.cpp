@@ -558,3 +558,116 @@ double compare::pitch_average_compare()
 	//correctness
 	return (cmp_pitch_average / std_pitch_average) * 100;
 }
+
+vector<double> compare::interpolation(vector<double> blk_stand, vector<double> blk_comp)
+{
+	//size of two blocks
+	double stand_s = blk_stand.size();
+	double compare_s = blk_comp.size();
+
+	int d1, d2, p1, p2;
+	int k;
+	//new block
+	vector<double> temp;
+	//interpolation - short to long
+	if (stand_s <= compare_s)
+	{
+		//get term
+		double term = compare_s / stand_s;
+		//initialize temp at 0, sizeof longer one
+		temp.assign(compare_s, 0);
+
+		//set temp data
+		for (int i = 0; i < stand_s; i++)
+		{
+			int idx = round(i*term);
+			temp[idx] = blk_stand[i];
+		}
+
+		//interpolation
+		for (int j = 0; j < compare_s; j++)
+		{
+			if (temp[j] == 0)
+			{
+				k = j;
+				//find p1
+				while (temp[k] == 0)
+				{
+					k--;
+				}
+				p1 = temp[k];
+				d1 = j - k;
+				//find p2
+				k = j;
+				while (temp[k] == 0)
+				{
+					k++;
+				}
+				p2 = temp[k];
+				d2 = k - j;
+
+				temp[j] = ((d1*p2) + (d2*p1)) / (d1 + d2);
+			}
+			else
+			{
+				continue;
+			}
+		}
+	}
+	else
+	{
+		//get term
+		double term = stand_s / compare_s;
+		//initialize temp at 0, sizeof longer one
+		temp.assign(stand_s, 0);
+
+		//set temp data
+		for (int i = 0; i < compare_s; i++)
+		{
+			int idx = round(i*term);
+			temp[idx] = blk_comp[i];
+		}
+
+		//interpolation
+		for (int j = 0; j < stand_s; j++)
+		{
+			if (temp[j] == 0)
+			{
+				k = j;
+				//find p1
+				while (temp[k] == 0)
+				{
+					k--;
+				}
+				p1 = temp[k];
+				d1 = j - k;
+				//find p2
+				k = j;
+				while (temp[k] == 0)
+				{
+					k++;
+				}
+				p2 = temp[k];
+				d2 = k - j;
+
+				temp[j] = ((d1*p2) + (d2*p1)) / (d1 + d2);
+			}
+			else
+			{
+				continue;
+			}
+		}
+	}
+
+	return temp;
+}
+
+//rounding func
+double compare::round(double value)
+{
+	double temp;
+	temp = value*pow(10, 1);
+	temp = floor(temp+0.5);
+	temp *= pow(10, -1);
+	return temp;
+}
