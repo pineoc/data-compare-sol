@@ -559,107 +559,151 @@ double compare::pitch_average_compare()
 	return (cmp_pitch_average / std_pitch_average) * 100;
 }
 
-vector<double> compare::interpolation(vector<double> blk_stand, vector<double> blk_comp)
+vector<double> compare::interpolation(vector<double> _vector, int size)
 {
-	//size of two blocks
-	double stand_s = blk_stand.size();
-	double compare_s = blk_comp.size();
+	//size of blocks
+	double vector_s = _vector.size();
 
 	int d1, d2, p1, p2;
 	int k;
+
 	//new block
 	vector<double> temp;
-	//interpolation - short to long
-	if (stand_s <= compare_s)
+	//initialize temp at 0, sizeof longer one
+	temp.assign(size, 0);
+
+	//get term
+	double term = size / vector_s;
+
+	//set temp data
+	for (int i = 0; i < vector_s; i++)
 	{
-		//get term
-		double term = compare_s / stand_s;
-		//initialize temp at 0, sizeof longer one
-		temp.assign(compare_s, 0);
+		int idx = round(i*term);
+		temp[idx] = _vector[i];
+	}
 
-		//set temp data
-		for (int i = 0; i < stand_s; i++)
+	//interpolation
+	for (int j = 0; j < size; j++)
+	{
+		if (temp[j] == 0)
 		{
-			int idx = round(i*term);
-			temp[idx] = blk_stand[i];
-		}
-
-		//interpolation
-		for (int j = 0; j < compare_s; j++)
-		{
-			if (temp[j] == 0)
+			k = j;
+			//find p1
+			while (temp[k] == 0)
 			{
-				k = j;
-				//find p1
-				while (temp[k] == 0)
-				{
-					k--;
-				}
-				p1 = temp[k];
-				d1 = j - k;
-				//find p2
-				k = j;
-				while (temp[k] == 0)
-				{
-					k++;
-				}
-				p2 = temp[k];
-				d2 = k - j;
-
+				k--;
+			}
+			p1 = temp[k];
+			d1 = j - k;
+			//find p2
+			k = j;
+			while (temp[k] == 0)
+			{
+				k++;
+			}
+			p2 = temp[k];
+			d2 = k - j;
 				temp[j] = ((d1*p2) + (d2*p1)) / (d1 + d2);
+		}
+		else
+		{
+			continue;
+		}
+	}
+	return temp;
+}
+
+bool compare::getInterpolatedVector(dataList stand, dataList comp)
+{
+	int s_stand = stand.getDataList().size();
+	int s_comp = comp.getDataList().size();
+
+	int s_std_blk, s_comp_blk;
+	int i;
+
+	vector<double> tmpPitch;
+	vector<double> tmpIntensity;
+	vector<double> tmpF2;
+	vector<double> tmpF3;
+
+	if (s_stand == s_comp) 
+	{
+		for (i = 0; i < s_stand; i++)
+		{
+			Data s_data = stand.getDataList()[i];
+			Data c_data = comp.getDataList()[i];
+			
+			////pitch
+			s_std_blk = s_data.getPitchVec().size();
+			s_comp_blk = c_data.getPitchVec().size();
+
+			if (s_std_blk < s_comp_blk)
+			{
+				//interpolation standard pitch
+				tmpPitch = interpolation(s_data.getPitchVec(), s_comp_blk);
+			}
+			else 
+			{
+				//interpolation compared pitch
+				tmpPitch = interpolation(c_data.getPitchVec(), s_std_blk);
+			}
+
+			////intensity
+			s_std_blk = s_data.getIntVec().size();
+			s_comp_blk = c_data.getIntVec().size();
+
+			if (s_std_blk < s_comp_blk)
+			{
+				//interpolation standard pitch
+				tmpIntensity = interpolation(s_data.getIntVec(), s_comp_blk);
 			}
 			else
 			{
-				continue;
+				//interpolation compared pitch
+				tmpIntensity = interpolation(c_data.getIntVec(), s_std_blk);
 			}
+
+			////formant2
+			s_std_blk = s_data.getFormant2Vec().size();
+			s_comp_blk = c_data.getFormant2Vec().size();
+
+			if (s_std_blk < s_comp_blk)
+			{
+				//interpolation standard pitch
+				tmpF2 = interpolation(s_data.getFormant2Vec(), s_comp_blk);
+			}
+			else
+			{
+				//interpolation compared pitch
+				tmpF2 = interpolation(c_data.getFormant2Vec(), s_std_blk);
+			}
+
+			////formant3
+			s_std_blk = s_data.getFormant3Vec().size();
+			s_comp_blk = c_data.getFormant3Vec().size();
+
+			if (s_std_blk < s_comp_blk)
+			{
+				//interpolation standard pitch
+				tmpF3 = interpolation(s_data.getFormant3Vec(), s_comp_blk);
+			}
+			else
+			{
+				//interpolation compared pitch
+				tmpF3 = interpolation(c_data.getFormant3Vec(), s_std_blk);
+			}
+
+	//make two block!!!!
+			
+
 		}
+		return true;
 	}
 	else
 	{
-		//get term
-		double term = stand_s / compare_s;
-		//initialize temp at 0, sizeof longer one
-		temp.assign(stand_s, 0);
-
-		//set temp data
-		for (int i = 0; i < compare_s; i++)
-		{
-			int idx = round(i*term);
-			temp[idx] = blk_comp[i];
-		}
-
-		//interpolation
-		for (int j = 0; j < stand_s; j++)
-		{
-			if (temp[j] == 0)
-			{
-				k = j;
-				//find p1
-				while (temp[k] == 0)
-				{
-					k--;
-				}
-				p1 = temp[k];
-				d1 = j - k;
-				//find p2
-				k = j;
-				while (temp[k] == 0)
-				{
-					k++;
-				}
-				p2 = temp[k];
-				d2 = k - j;
-
-				temp[j] = ((d1*p2) + (d2*p1)) / (d1 + d2);
-			}
-			else
-			{
-				continue;
-			}
-		}
+		return  false;
 	}
 
-	return temp;
 }
 
 //rounding func

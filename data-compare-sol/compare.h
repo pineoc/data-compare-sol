@@ -42,6 +42,9 @@ private:
 	vector<double> compFormant3Vec;
 	vector<double> compIntensityVec;
 
+	dataList interp_stand;
+	dataList interp_comp;
+
 public:
 	//init compare object
 	compare(string standardDataFilename, string compareDataFilename);
@@ -86,6 +89,7 @@ public:
 
 	//DataList logic functions
 	void makeDataList();
-	vector<double> interpolation(vector<double> blk_stand, vector<double> blk_comp);
+	vector<double> interpolation(vector<double> _vector, int size);
+	bool getInterpolatedVector(dataList stand, dataList comp);
 	double round(double value);
 };
