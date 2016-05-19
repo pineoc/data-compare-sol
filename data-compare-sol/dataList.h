@@ -18,6 +18,7 @@ class dataList
 private:
 	vector<Data> objDataList;
 public:
+	dataList();
 	dataList(vector<double> pitchV, vector<double> f2V, vector<double> f3V, vector<double> intV);
 	~dataList();
 	void pushList(Data d);

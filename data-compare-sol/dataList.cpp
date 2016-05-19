@@ -1,6 +1,10 @@
 #include "dataList.h"
 
 
+dataList::dataList()
+{
+}
+
 dataList::dataList(vector<double> pitchV, vector<double> f2V, vector<double> f3V, vector<double> intV)
 {
 	//make data list of data node

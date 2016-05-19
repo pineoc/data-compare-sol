@@ -615,23 +615,32 @@ vector<double> compare::interpolation(vector<double> _vector, int size)
 
 bool compare::getInterpolatedVector(dataList stand, dataList comp)
 {
+	//data list size
 	int s_stand = stand.getDataList().size();
 	int s_comp = comp.getDataList().size();
 
+	//blocks
 	int s_std_blk, s_comp_blk;
 	int i;
 
+	//temp vectors
 	vector<double> tmpPitch;
 	vector<double> tmpIntensity;
 	vector<double> tmpF2;
 	vector<double> tmpF3;
 
+	//two list size must be same
 	if (s_stand == s_comp) 
 	{
 		for (i = 0; i < s_stand; i++)
 		{
+			//get i_th block
 			Data s_data = stand.getDataList()[i];
 			Data c_data = comp.getDataList()[i];
+
+			//make new block after interpolation
+			Data s_newData;
+			Data c_newData;
 			
 			////pitch
 			s_std_blk = s_data.getPitchVec().size();
@@ -641,11 +650,16 @@ bool compare::getInterpolatedVector(dataList stand, dataList comp)
 			{
 				//interpolation standard pitch
 				tmpPitch = interpolation(s_data.getPitchVec(), s_comp_blk);
+				//set pitch vector
+				s_newData.setPitchVec(tmpPitch);
+				c_newData.setPitchVec(c_data.getPitchVec());
 			}
 			else 
 			{
 				//interpolation compared pitch
 				tmpPitch = interpolation(c_data.getPitchVec(), s_std_blk);
+				s_newData.setPitchVec(s_data.getPitchVec());
+				c_newData.setPitchVec(tmpPitch);
 			}
 
 			////intensity
@@ -656,11 +670,17 @@ bool compare::getInterpolatedVector(dataList stand, dataList comp)
 			{
 				//interpolation standard pitch
 				tmpIntensity = interpolation(s_data.getIntVec(), s_comp_blk);
+				//set intensity vector
+				s_newData.setIntVec(tmpIntensity);
+				c_newData.setIntVec(c_data.getIntVec());
 			}
 			else
 			{
 				//interpolation compared pitch
 				tmpIntensity = interpolation(c_data.getIntVec(), s_std_blk);
+				//set intensity vector
+				s_newData.setIntVec(s_data.getIntVec());
+				c_newData.setIntVec(tmpIntensity);
 			}
 
 			////formant2
@@ -671,11 +691,17 @@ bool compare::getInterpolatedVector(dataList stand, dataList comp)
 			{
 				//interpolation standard pitch
 				tmpF2 = interpolation(s_data.getFormant2Vec(), s_comp_blk);
+				//set formant2 vector
+				s_newData.setFormant2Vec(tmpF2);
+				c_newData.setFormant2Vec(c_data.getFormant2Vec());
 			}
 			else
 			{
 				//interpolation compared pitch
 				tmpF2 = interpolation(c_data.getFormant2Vec(), s_std_blk);
+				//set formant2 vector
+				s_newData.setFormant2Vec(s_data.getFormant2Vec());
+				c_newData.setFormant2Vec(tmpF2);
 			}
 
 			////formant3
@@ -686,17 +712,26 @@ bool compare::getInterpolatedVector(dataList stand, dataList comp)
 			{
 				//interpolation standard pitch
 				tmpF3 = interpolation(s_data.getFormant3Vec(), s_comp_blk);
+				//set formant3 vector
+				s_newData.setFormant3Vec(tmpF3);
+				c_newData.setFormant3Vec(c_data.getFormant3Vec());
 			}
 			else
 			{
 				//interpolation compared pitch
 				tmpF3 = interpolation(c_data.getFormant3Vec(), s_std_blk);
+				//set formant3 vector
+				s_newData.setFormant3Vec(s_data.getFormant3Vec());
+				c_newData.setFormant3Vec(tmpF3);
 			}
 
-	//make two block!!!!
-			
+			//make new data list
+			interp_stand.pushList(s_newData);
+			interp_comp.pushList(c_newData);
 
 		}
+
+		//finish making new dataList
 		return true;
 	}
 	else
