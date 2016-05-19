@@ -11,12 +11,15 @@ dataList::dataList(vector<double> pitchV, vector<double> f2V, vector<double> f3V
 	//using vector stream
 
 	double int_avg = 0.0;
+	int intV_size = intV.size();
+
+
 	//get intensity average value
-	for (int i = 2; i < intV.size() - 2; i++)
+	for (int i = 2; i < intV_size - 2; i++)
 		int_avg += intV[i];
-	int_avg = int_avg / (double)(intV.size() - 4);
+	int_avg = int_avg / (double)(intV_size - 4);
 	
-	for (int i = 0; i < intV.size(); i++)
+	for (int i = 0; i < intV_size; i++)
 	{
 		//data block start
 		if (intV[i] > int_avg)
@@ -33,7 +36,7 @@ dataList::dataList(vector<double> pitchV, vector<double> f2V, vector<double> f3V
 				f3Block.push_back(f3V[i]);
 				intBlock.push_back(intV[i]);
 				i++;
-				if (intV.size() == i)
+				if (intV_size == i)
 					break;
 			}
 			d.setPitchVec(pitchBlock);

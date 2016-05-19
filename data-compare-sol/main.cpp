@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
 		oCompare->setIntensityData();
 		oCompare->setPitchData();
 
-		cout << "===========raw similarity check===============" << endl;
+		cout << "===========[all stream] raw similarity check===============" << endl;
 		cout << "raw compare pitch: " << oCompare->raw_compare_pitch() << endl;
 		cout << "raw compare intensity: " << oCompare->raw_compare_intensity() << endl;
 		cout << "raw compare formant" << endl;
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 		cout << endl;
 
 
-		cout << "===========cosine similarity check===============" << endl;
+		cout << "===========[all stream] cosine similarity check===============" << endl;
 		cout << "cosine compare pitch: " << oCompare->cosine_compare_pitch() << endl;
 		cout << "cosine compare intensity: " << oCompare->cosine_compare_intensity() << endl;
 		cout << "cosine compare formant" << endl;
@@ -40,10 +40,22 @@ int main(int argc, char* argv[])
 		cout << "func3: " << oCompare->cosine_compare_formant().func3Res << endl;
 		cout << endl;
 
+		//median filtering before make datalist
 		oCompare->median_function();
 
-		//test make data list
-		oCompare->makeDataList();
+		//make data list
+		cout << "===========[block] cosine similarity check===============" << endl;
+		if (oCompare->makeDataList())
+		{//make dataList success
+			//block compare start
+			cout << "cosine compare pitch: " << oCompare->block_cosine_compare_pitch() << endl;	
+		}
+		else
+		{//make dataList fail
+			cout << "make datalist fail" << endl;
+		}
+		cout << endl;
+
 
 	}
 	else

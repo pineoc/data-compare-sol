@@ -53,14 +53,6 @@ void compare::setPitchData()
 			
 		}
 
-		//remove --undefined-- in the back
-		while (1)
-		{
-			if (standPitchVec.back() == 0)
-				standPitchVec.pop_back();
-			else
-				break;
-		}
 	}
 
 	//read from file compare pitch data
@@ -88,14 +80,6 @@ void compare::setPitchData()
 			compPitchVec.push_back(atof(point.c_str()));
 		}
 
-		//remove --undefined-- in the back
-		while (1)
-		{
-			if (compPitchVec.back() == 0)
-				compPitchVec.pop_back();
-			else
-				break;
-		}
 	}
 }
 
@@ -157,7 +141,6 @@ void compare::setIntensityData()
 {
 	//read from file standard intensity data
 	//start point check
-	bool start = false;
 	if (standardIntensityFile.is_open())
 	{
 		while (!standardIntensityFile.eof())
@@ -167,27 +150,22 @@ void compare::setIntensityData()
 			standardIntensityFile >> time >> point;
 
 			//set 0 - --undefined-- intensity
-			if (!point.compare("--undefined--") || !point.compare("intensity"))
+			if (!point.compare("intensity"))
+				continue;
+
+			if (!point.compare("--undefined--"))
 			{
 				point = "0";
 			}
-
-			if (point != "0")
-			{
-				start = true;
-			}
-			//store after start
-			if (start)
-			{
-				standIntencityVec.push_back(atof(point.c_str()));
-			}
+			
+			standIntencityVec.push_back(atof(point.c_str()));
+			
 		}
 
 	}
 
 	//read from file compare pitch data
 	//start point check value set false
-	start = false;
 	if (compIntensityFile.is_open())
 	{
 		while (!compIntensityFile.eof())
@@ -197,22 +175,16 @@ void compare::setIntensityData()
 			compIntensityFile >> time >> point;
 
 			//set 0 - --undefined-- intensity
-			if (!point.compare("--undefined--") || !point.compare("intensity"))
+			if (!point.compare("intensity"))
+				continue;
+
+			if (!point.compare("--undefined--"))
 			{
 				point = "0";
 			}
-
-			if (point != "0")
-			{
-				start = true;
-			}
 			//store after start
-			if (start)
-			{
-				compIntensityVec.push_back(atof(point.c_str()));
-			}
+			compIntensityVec.push_back(atof(point.c_str()));
 		}
-
 	}
 }
 
@@ -458,6 +430,58 @@ double compare::euclidean_compare_intensity()
 }
 */
 
+double compare::block_cosine_compare_pitch()
+{
+	//get datalist size
+	int comp_vec_size = interp_stand.getDataList().size();
+	double result = 0.0;
+
+	//compare start
+	for (int i = 0; i < comp_vec_size; i++)
+	{
+		Data stand_d = interp_stand.getDataList()[i];
+		Data comp_d = interp_comp.getDataList()[i];
+		double comp_res = getCosineSimilarity(stand_d.getPitchVec(), comp_d.getPitchVec());
+		result += comp_res;
+	}
+	result = result / (double)comp_vec_size;
+	return result;
+}
+
+formantCompResultType compare::block_cosine_comapre_formant()
+{
+	return formantCompResultType();
+}
+
+double compare::block_cosine_compare_intensity()
+{
+	return 0.0;
+}
+
+double compare::getCosineSimilarity(vector<double> v1, vector<double> v2)
+{
+	double similarityValue = 0.0;
+	double topValue = 0.0;
+	double bottomValue = 0.0;
+	double bottomVal1 = 0.0, bottomVal2 = 0.0;
+
+	//vector length set
+	int vecLength = v1.size();
+
+	//top value sum
+	for (int i = 0; i < vecLength; i++)
+		topValue += v1[i] * v2[i];
+
+	for (int i = 0; i < vecLength; i++)
+	{
+		bottomVal1 += pow(v1[i], 2);
+		bottomVal2 += pow(v2[i], 2);
+	}
+	bottomValue = sqrt(bottomVal1) * sqrt(bottomVal2);
+	similarityValue = topValue / bottomValue;
+	return similarityValue * 100;
+}
+
 void compare::median_function()
 {
 	double filter[5];
@@ -524,12 +548,16 @@ void compare::median_function()
 	compFormant3Vec = tmpVec;
 }
 
-void compare::makeDataList()
+bool compare::makeDataList()
 {
-	dataList* standDL = new dataList(standPitchVec, standFormant2Vec, standFormant3Vec, standIntencityVec);
-	dataList* compDL = new dataList(compPitchVec, compFormant2Vec, compFormant3Vec, compIntensityVec);
+	standDL = new dataList(standPitchVec, standFormant2Vec, standFormant3Vec, standIntencityVec);
+	compDL = new dataList(compPitchVec, compFormant2Vec, compFormant3Vec, compIntensityVec);
 
-	cout << "" << endl;
+	if (getInterpolatedVector(*standDL, *compDL))
+		return true;
+	else
+		//error on get interpolation
+		return false;
 }
 
 //cmompare pitch average
@@ -597,13 +625,13 @@ vector<double> compare::interpolation(vector<double> _vector, int size)
 			d1 = j - k;
 			//find p2
 			k = j;
-			while (temp[k] == 0)
+			while (temp[k] == 0 && k < size-1)
 			{
 				k++;
 			}
 			p2 = temp[k];
 			d2 = k - j;
-				temp[j] = ((d1*p2) + (d2*p1)) / (d1 + d2);
+			temp[j] = ((d1*p2) + (d2*p1)) / (d1 + d2);
 		}
 		else
 		{

@@ -42,6 +42,11 @@ private:
 	vector<double> compFormant3Vec;
 	vector<double> compIntensityVec;
 
+	//before interpolate dataList
+	dataList* standDL;
+	dataList* compDL;
+
+	//after interpolated dataList
 	dataList interp_stand;
 	dataList interp_comp;
 
@@ -81,6 +86,14 @@ public:
 	//formantCompResultType euclidean_compare_formant();
 	//double euclidean_compare_intensity();
 
+	//based blockList compare, cosine similarity
+	double block_cosine_compare_pitch();
+	formantCompResultType block_cosine_comapre_formant();
+	double block_cosine_compare_intensity();
+
+	//get cosine similarity value of two vectors
+	double getCosineSimilarity(vector<double> v1, vector<double> v2);
+
 	//median filtering
 	void median_function();
 
@@ -88,7 +101,9 @@ public:
 	double pitch_average_compare();
 
 	//DataList logic functions
-	void makeDataList();
+	bool makeDataList();
+
+	//interpolate functions
 	vector<double> interpolation(vector<double> _vector, int size);
 	bool getInterpolatedVector(dataList stand, dataList comp);
 	double round(double value);
