@@ -601,23 +601,28 @@ double compare::pitch_average_compare()
 	double cmp_pitch_average = 0;
 
 	//get standard pitch averages
-	for (int i = 0; i < standPitchVec.size(); i++)
+	int standPitchSize = standPitchVec.size();
+	for (int i = 0; i < standPitchSize; i++)
 	{
 		std_pitch_average += standPitchVec[i];
 	}
 
-	std_pitch_average = (std_pitch_average / standPitchVec.size());
+	std_pitch_average = (std_pitch_average / standPitchSize);
 
 	//get compared pitch averages
-	for (int i = 0; i < compPitchVec.size(); i++)
+	int compPitchSize = compPitchVec.size();
+	for (int i = 0; i < compPitchSize; i++)
 	{
-		cmp_pitch_average += standPitchVec[i];
+		cmp_pitch_average += compPitchVec[i];
 	}
 
-	cmp_pitch_average = (cmp_pitch_average / compPitchVec.size());
+	cmp_pitch_average = (cmp_pitch_average / compPitchSize);
 
 	//correctness
-	return (cmp_pitch_average / std_pitch_average) * 100;
+	if(cmp_pitch_average > std_pitch_average)
+		return (std_pitch_average / cmp_pitch_average) * 100;
+	else
+		return (cmp_pitch_average / std_pitch_average) * 100;
 }
 
 vector<double> compare::interpolation(vector<double> _vector, int size)
@@ -631,7 +636,7 @@ vector<double> compare::interpolation(vector<double> _vector, int size)
 	//new block
 	vector<double> temp;
 	//initialize temp at 0, sizeof longer one
-	temp.assign(size, 0);
+	temp.assign(size, -1);
 
 	//get term
 	double term = size / vector_s;
@@ -646,11 +651,11 @@ vector<double> compare::interpolation(vector<double> _vector, int size)
 	//interpolation
 	for (int j = 0; j < size; j++)
 	{
-		if (temp[j] == 0)
+		if (temp[j] == -1)
 		{
 			k = j;
 			//find p1
-			while (temp[k] == 0)
+			while (temp[k] == -1)
 			{
 				k--;
 			}
@@ -658,7 +663,7 @@ vector<double> compare::interpolation(vector<double> _vector, int size)
 			d1 = j - k;
 			//find p2
 			k = j;
-			while (temp[k] == 0 && k < size-1)
+			while (temp[k] == -1 && k < size-1)
 			{
 				k++;
 			}

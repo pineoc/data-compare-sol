@@ -53,6 +53,7 @@ int main(int argc, char* argv[])
 			cout << "cosine copmare intensity: " << oCompare->block_cosine_compare_intensity() << endl;
 			cout << "cosine compare formant f2: " << block_cosine_compare_f_data.func2Res << endl;
 			cout << "cosine compare formant f3: " << block_cosine_compare_f_data.func3Res << endl;
+			cout << "pitch avg rate: " << oCompare->pitch_average_compare() << endl;
 		}
 		else
 		{//make dataList fail
@@ -76,6 +77,7 @@ int main(int argc, char* argv[])
 		auto raw_f_rate = oCompare->raw_compare_formant();
 		double raw_formant2_rate = raw_f_rate.func2Res;
 		double raw_formant3_rate = raw_f_rate.func3Res;
+		double pitch_avg = oCompare->pitch_average_compare();
 		if (isnan(raw_pitch_rate))
 			raw_pitch_rate = 0.0;
 		if (isnan(raw_int_rate))
@@ -84,7 +86,9 @@ int main(int argc, char* argv[])
 			raw_formant2_rate = 0.0;
 		if (isnan(raw_formant3_rate))
 			raw_formant3_rate = 0.0;
+
 		cout << "{ \"pitch_rate\": " << raw_pitch_rate << ",";
+		cout << "\"pitch_avg\": " << pitch_avg << ",";
 		cout << "\"int_rate\": " << raw_int_rate << ",";
 		cout << "\"f2_rate\": " << raw_formant2_rate << ",";
 		cout << "\"f3_rate\": " << raw_formant3_rate << " }";
@@ -104,6 +108,7 @@ int main(int argc, char* argv[])
 		auto cosine_f_rate = oCompare->cosine_compare_formant();
 		double cosine_f2_rate = cosine_f_rate.func2Res;
 		double cosine_f3_rate = cosine_f_rate.func3Res;
+		double pitch_avg = oCompare->pitch_average_compare();
 		if (isnan(cosine_pitch_rate))
 			cosine_pitch_rate = 0.0;
 		if (isnan(cosine_int_rate))
@@ -112,7 +117,9 @@ int main(int argc, char* argv[])
 			cosine_f2_rate = 0.0;
 		if (isnan(cosine_f3_rate))
 			cosine_f3_rate = 0.0;
+
 		cout << "{ \"pitch_rate\": " << cosine_pitch_rate << ",";
+		cout << "\"pitch_avg\": " << pitch_avg << ",";
 		cout << "\"int_rate\": " << cosine_int_rate << ",";
 		cout << "\"f2_rate\": " << cosine_f2_rate << ",";
 		cout << "\"f3_rate\": " << cosine_f3_rate << " }";
@@ -136,6 +143,7 @@ int main(int argc, char* argv[])
 		auto cosine_f_rate = oCompare->cosine_compare_formant();
 		double cosine_f2_rate = cosine_f_rate.func2Res;
 		double cosine_f3_rate = cosine_f_rate.func3Res;
+		double pitch_avg = oCompare->pitch_average_compare();
 		if (isnan(cosine_pitch_rate))
 			cosine_pitch_rate = 0.0;
 		if (isnan(cosine_int_rate))
@@ -144,7 +152,9 @@ int main(int argc, char* argv[])
 			cosine_f2_rate = 0.0;
 		if (isnan(cosine_f3_rate))
 			cosine_f3_rate = 0.0;
+
 		cout << "{ \"pitch_rate\": " << cosine_pitch_rate << ",";
+		cout << "\"pitch_avg\": " << pitch_avg << ",";
 		cout << "\"int_rate\": " << cosine_int_rate << ",";
 		cout << "\"f2_rate\": " << cosine_f2_rate << ",";
 		cout << "\"f3_rate\": " << cosine_f3_rate << " }";
@@ -163,6 +173,8 @@ int main(int argc, char* argv[])
 		//median filtering
 		oCompare->median_function();
 
+		double pitch_avg = oCompare->pitch_average_compare();
+
 		//median filtering + data block parsing + cosine similarity
 		if (oCompare->makeDataList())
 		{//make dataList success
@@ -172,6 +184,7 @@ int main(int argc, char* argv[])
 			auto cosine_f_rate = oCompare->block_cosine_compare_formant();
 			double cosine_f2_rate = cosine_f_rate.func2Res;
 			double cosine_f3_rate = cosine_f_rate.func3Res;
+			
 			if (isnan(cosine_pitch_rate))
 				cosine_pitch_rate = 0.0;
 			if (isnan(cosine_int_rate))
@@ -181,6 +194,7 @@ int main(int argc, char* argv[])
 			if (isnan(cosine_f3_rate))
 				cosine_f3_rate = 0.0;
 			cout << "{ \"pitch_rate\": " << cosine_pitch_rate << ",";
+			cout << "\"pitch_avg\": " << pitch_avg << ",";
 			cout << "\"int_rate\": " << cosine_int_rate << ",";
 			cout << "\"f2_rate\": " << cosine_f2_rate << ",";
 			cout << "\"f3_rate\": " << cosine_f3_rate << " }";
@@ -189,6 +203,7 @@ int main(int argc, char* argv[])
 		else
 		{//make dataList fail
 			cout << "{ \"pitch_rate\": " << 0.0 << ",";
+			cout << "\"pitch_avg\": " << pitch_avg << ",";
 			cout << "\"int_rate\": " << 0.0 << ",";
 			cout << "\"f2_rate\": " << 0.0 << ",";
 			cout << "\"f3_rate\": " << 0.0 << " }";
