@@ -88,7 +88,7 @@ public:
 
 	//based blockList compare, cosine similarity
 	double block_cosine_compare_pitch();
-	formantCompResultType block_cosine_comapre_formant();
+	formantCompResultType block_cosine_compare_formant();
 	double block_cosine_compare_intensity();
 
 	//get cosine similarity value of two vectors

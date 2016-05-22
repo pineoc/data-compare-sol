@@ -448,14 +448,43 @@ double compare::block_cosine_compare_pitch()
 	return result;
 }
 
-formantCompResultType compare::block_cosine_comapre_formant()
+formantCompResultType compare::block_cosine_compare_formant()
 {
-	return formantCompResultType();
+	//get datalist size
+	int comp_vec_size = interp_stand.getDataList().size();
+	formantCompResultType result = {0.0, 0.0};
+
+	//compare start
+	for (int i = 0; i < comp_vec_size; i++)
+	{
+		Data stand_d = interp_stand.getDataList()[i];
+		Data comp_d = interp_comp.getDataList()[i];
+		double comp_res_f2 = getCosineSimilarity(stand_d.getFormant2Vec(), comp_d.getFormant2Vec());
+		double comp_res_f3 = getCosineSimilarity(stand_d.getFormant3Vec(), comp_d.getFormant3Vec());
+		result.func2Res += comp_res_f2;
+		result.func3Res += comp_res_f3;
+	}
+	result.func2Res = result.func2Res / (double)comp_vec_size;
+	result.func3Res = result.func3Res / (double)comp_vec_size;
+	return result;
 }
 
 double compare::block_cosine_compare_intensity()
 {
-	return 0.0;
+	//get datalist size
+	int comp_vec_size = interp_stand.getDataList().size();
+	double result = 0.0;
+
+	//compare start
+	for (int i = 0; i < comp_vec_size; i++)
+	{
+		Data stand_d = interp_stand.getDataList()[i];
+		Data comp_d = interp_comp.getDataList()[i];
+		double comp_res = getCosineSimilarity(stand_d.getIntVec(), comp_d.getIntVec());
+		result += comp_res;
+	}
+	result = result / (double)comp_vec_size;
+	return result;
 }
 
 double compare::getCosineSimilarity(vector<double> v1, vector<double> v2)
@@ -489,7 +518,8 @@ void compare::median_function()
 	tmpVec.assign(compPitchVec.size(), 0.0);
 
 	//pitch vector median
-	for (int i = 0; i < compPitchVec.size() - 4; i++)
+	int pitchSize = compPitchVec.size();
+	for (int i = 0; i < pitchSize - 4; i++)
 	{
 		filter[0] = compPitchVec[i];
 		filter[1] = compPitchVec[i + 1];
@@ -505,7 +535,8 @@ void compare::median_function()
 	//intensity median
 	tmpVec.clear();
 	tmpVec.assign(compIntensityVec.size(), 0.0);
-	for (int i = 0; i < compIntensityVec.size() - 4; i++)
+	int intensitySize = compIntensityVec.size();
+	for (int i = 0; i < intensitySize - 4; i++)
 	{
 		filter[0] = compIntensityVec[i];
 		filter[1] = compIntensityVec[i + 1];
@@ -522,7 +553,8 @@ void compare::median_function()
 	//f2 median
 	tmpVec.clear();
 	tmpVec.assign(compFormant2Vec.size(), 0.0);
-	for (int i = 0; i < compFormant2Vec.size() - 2; i++)
+	int f2Size = compFormant2Vec.size();
+	for (int i = 0; i < f2Size - 2; i++)
 	{
 		filter[0] = compFormant2Vec[i];
 		filter[1] = compFormant2Vec[i + 1];
@@ -536,7 +568,8 @@ void compare::median_function()
 	//f3 median
 	tmpVec.clear();
 	tmpVec.assign(compFormant3Vec.size(), 0.0);
-	for (int i = 0; i < compFormant3Vec.size() - 2; i++)
+	int f3Size = compFormant3Vec.size();
+	for (int i = 0; i < f3Size - 2; i++)
 	{
 		filter[0] = compFormant3Vec[i];
 		filter[1] = compFormant3Vec[i + 1];
