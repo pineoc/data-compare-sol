@@ -241,6 +241,8 @@ int main(int argc, char* argv[])
 		oCompare->setIntensityData();
 		oCompare->setPitchData();
 
+		double pitch_avg = oCompare->pitch_average_compare();
+
 		//print to stdout
 		double cosine_pitch_rate = oCompare->cosine_compare_pitch();
 		double cosine_int_rate = oCompare->cosine_compare_intensity();
@@ -372,6 +374,7 @@ int main(int argc, char* argv[])
 		if (isnan(cosine_f3_rate))
 			cosine_f3_rate = 0.0;
 		cout << "{ \"pitch_rate\": " << cosine_pitch_rate << ",";
+		cout << "\"pitch_avg\": " << pitch_avg << ",";
 		cout << "\"int_rate\": " << cosine_int_rate << ",";
 		cout << "\"f2_rate\": " << cosine_f2_rate << ",";
 		cout << "\"f3_rate\": " << cosine_f3_rate << " }";
