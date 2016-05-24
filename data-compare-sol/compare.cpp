@@ -599,21 +599,31 @@ double compare::pitch_average_compare()
 
 	//get standard pitch averages
 	int standPitchSize = standPitchVec.size();
+	int count = 0;
 	for (int i = 0; i < standPitchSize; i++)
 	{
-		std_pitch_average += standPitchVec[i];
+		if (standPitchVec[i] != 0.0)
+		{
+			std_pitch_average += standPitchVec[i];
+			count++;
+		}			
 	}
 
-	std_pitch_average = (std_pitch_average / standPitchSize);
+	std_pitch_average = (std_pitch_average / count);
 
 	//get compared pitch averages
 	int compPitchSize = compPitchVec.size();
+	count = 0;
 	for (int i = 0; i < compPitchSize; i++)
 	{
-		cmp_pitch_average += compPitchVec[i];
+		if (compPitchVec[i] != 0.0)
+		{
+			cmp_pitch_average += compPitchVec[i];
+			count++;
+		}		
 	}
 
-	cmp_pitch_average = (cmp_pitch_average / compPitchSize);
+	cmp_pitch_average = (cmp_pitch_average / count);
 
 	//correctness
 	if(cmp_pitch_average > std_pitch_average)
