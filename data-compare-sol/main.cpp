@@ -3,6 +3,7 @@
 #include "compare.h"
 using namespace std;
 
+#define DEBUG 0
 
 int main(int argc, char* argv[])
 {
