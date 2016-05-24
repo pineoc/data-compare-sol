@@ -30,7 +30,7 @@ private:
 	vector<double> standPitchVec;
 	vector<double> standFormant2Vec;
 	vector<double> standFormant3Vec;
-	vector<double> standIntencityVec;
+	vector<double> standIntensityVec;
 
 	//compare audio data file
 	ifstream compPitchFile;
@@ -107,4 +107,7 @@ public:
 	vector<double> interpolation(vector<double> _vector, int size);
 	bool getInterpolatedVector(dataList stand, dataList comp);
 	double round(double value);
+
+	//data combine
+	void combineData(string outFileName); 
 };

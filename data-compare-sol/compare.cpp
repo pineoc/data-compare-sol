@@ -30,7 +30,6 @@ void compare::setPitchData()
 {
 	//read from file standard pitch data
 	//start point check
-	bool start = false;
 	if (standardPitchFile.is_open())
 	{
 		while (!standardPitchFile.eof())
@@ -57,7 +56,6 @@ void compare::setPitchData()
 
 	//read from file compare pitch data
 	//start point check value set false
-	start = false;
 	if (compPitchFile.is_open())
 	{
 		while (!compPitchFile.eof())
@@ -90,7 +88,7 @@ vector<double> compare::getPitchData()
 
 void compare::setFormantData()
 {
-	//read from file standard intensity data
+	//read from file standard Formant data
 
 	if (standardFormantFile.is_open())
 	{
@@ -111,7 +109,7 @@ void compare::setFormantData()
 		}
 	}
 
-	//read from file compare pitch data
+	//read from file compare Formant data
 	if (compFormantFile.is_open())
 	{
 		while (!compFormantFile.eof())
@@ -158,14 +156,13 @@ void compare::setIntensityData()
 				point = "0";
 			}
 			
-			standIntencityVec.push_back(atof(point.c_str()));
+			standIntensityVec.push_back(atof(point.c_str()));
 			
 		}
 
 	}
 
-	//read from file compare pitch data
-	//start point check value set false
+	//read from file compare intensity data
 	if (compIntensityFile.is_open())
 	{
 		while (!compIntensityFile.eof())
@@ -190,7 +187,7 @@ void compare::setIntensityData()
 
 vector<double> compare::getIntensityData()
 {
-	return standIntencityVec;
+	return standIntensityVec;
 }
 
 double compare::raw_compare_pitch()
@@ -266,15 +263,15 @@ double compare::raw_compare_intensity()
 	//exist both data - compare
 	int correctCnt = 0;
 	int min = 0;
-	if (standIntencityVec.size() > compIntensityVec.size())
+	if (standIntensityVec.size() > compIntensityVec.size())
 		min = compIntensityVec.size();
 	else
-		min = standIntencityVec.size();
+		min = standIntensityVec.size();
 
 	for (int i = 0; i < min; i++)
 	{
 		//male-10 < female < male+10 ? check similar.
-		if (abs(standIntencityVec[i] - compIntensityVec[i]) < RAW_INTENSITY_COMPARE_DIFF)
+		if (abs(standIntensityVec[i] - compIntensityVec[i]) < RAW_INTENSITY_COMPARE_DIFF)
 			correctCnt++;
 	}
 	//return corrected count, percent
@@ -376,15 +373,15 @@ double compare::cosine_compare_intensity()
 	double bottomVal1 = 0.0, bottomVal2 = 0.0;
 
 	//vector length set
-	int vecLength = min(standIntencityVec.size(), compIntensityVec.size());
+	int vecLength = min(standIntensityVec.size(), compIntensityVec.size());
 
 	//top value sum
 	for (int i = 0; i < vecLength; i++)
-		topValue += standIntencityVec[i] * compIntensityVec[i];
+		topValue += standIntensityVec[i] * compIntensityVec[i];
 
 	for (int i = 0; i < vecLength; i++)
 	{
-		bottomVal1 += pow(standIntencityVec[i], 2);
+		bottomVal1 += pow(standIntensityVec[i], 2);
 		bottomVal2 += pow(compIntensityVec[i], 2);
 	}
 	bottomValue = sqrt(bottomVal1) * sqrt(bottomVal2);
@@ -583,7 +580,7 @@ void compare::median_function()
 
 bool compare::makeDataList()
 {
-	standDL = new dataList(standPitchVec, standFormant2Vec, standFormant3Vec, standIntencityVec);
+	standDL = new dataList(standPitchVec, standFormant2Vec, standFormant3Vec, standIntensityVec);
 	compDL = new dataList(compPitchVec, compFormant2Vec, compFormant3Vec, compIntensityVec);
 
 	if (getInterpolatedVector(*standDL, *compDL))
@@ -815,4 +812,129 @@ double compare::round(double value)
 	temp = floor(temp+0.5);
 	temp *= pow(10, -1);
 	return temp;
+}
+
+void compare::combineData(string outFileName)
+{
+	//outfile pitch stream
+	ofstream outfile_p;
+	string p_str = outFileName + "-p.out";
+	outfile_p.open(p_str);
+
+	//outfile intensity stream
+	ofstream outfile_i;
+	string i_str = outFileName + "-i.out";
+	outfile_p.open(i_str);
+
+	//outfile formant stream
+	ofstream outfile_f;
+	string f_str = outFileName + "-f.out";
+	outfile_p.open(f_str);
+
+	//two vector size
+	int s_v1, s_v2;
+
+	//new vector
+	vector<double> tempVec;
+
+	//pitch
+	s_v1 = standPitchVec.size();
+	s_v2 = compPitchVec.size();
+
+	if (s_v1 > s_v2) {
+		//pitch
+		//get tempVec - interpolation
+		tempVec = interpolation(compPitchVec, s_v1);
+		//combine stand + temp
+		for (int i = 0; i < s_v1; i++) {
+			standPitchVec[i] = (standPitchVec[i] + tempVec[i]) / 2.0;
+		}
+		tempVec.clear();
+
+		//intensity
+		tempVec = interpolation(compIntensityVec, s_v1);
+		//combine stand + temp
+		for (int i = 0; i < s_v1; i++) {
+			standIntensityVec[i] = (standIntensityVec[i] + tempVec[i]) / 2.0;
+		}
+		tempVec.clear();
+
+		//formant2
+		tempVec = interpolation(compFormant2Vec, s_v1);
+		//combine stand + temp
+		for (int i = 0; i < s_v1; i++) {
+			standFormant2Vec[i] = (standFormant2Vec[i] + tempVec[i]) / 2.0;
+		}
+		tempVec.clear();
+
+		//formant3
+		tempVec = interpolation(compFormant3Vec, s_v1);
+		//combine stand + temp
+		for (int i = 0; i < s_v1; i++) {
+			standFormant3Vec[i] = (standFormant3Vec[i] + tempVec[i]) / 2.0;
+		}
+		tempVec.clear();
+
+	}
+	else {
+		//pitch
+		//get tempVec - interpolation
+		tempVec = interpolation(standPitchVec, s_v1);
+		//combine comp + temp
+		for (int i = 0; i < s_v1; i++) {
+			standPitchVec[i] = (compPitchVec[i] + tempVec[i]) / 2.0;
+		}
+		tempVec.clear();
+
+		//intensity
+		tempVec = interpolation(standIntensityVec, s_v1);
+		//combine comp + temp
+		for (int i = 0; i < s_v1; i++) {
+			standIntensityVec[i] = (compIntensityVec[i] + tempVec[i]) / 2.0;
+		}
+		tempVec.clear();
+
+		//formant2
+		tempVec = interpolation(standFormant2Vec, s_v1);
+		//combine comp + temp
+		for (int i = 0; i < s_v1; i++) {
+			standFormant2Vec[i] = (compFormant2Vec[i] + tempVec[i]) / 2.0;
+		}
+		tempVec.clear();
+
+		//formant3
+		tempVec = interpolation(standFormant3Vec, s_v1);
+		//combine comp + temp
+		for (int i = 0; i < s_v1; i++) {
+			standFormant3Vec[i] = (compFormant3Vec[i] + tempVec[i]) / 2.0;
+		}
+		tempVec.clear();
+	}
+
+	//file write to outfilename, pitch
+	outfile_p << "time" << "	" << "pitch" << endl;
+	int vecSize = standPitchVec.size();
+	for (int i = 0; i < vecSize; i++)
+	{
+		outfile_p << 0.01 * i << "	" << standPitchVec[i] << endl;
+	}
+
+	//file write to outfilename, formant
+	outfile_f << "time" << "	" << "f2" << "	" << "f3" << endl;
+	for (int i = 0; i < vecSize; i++)
+	{
+		outfile_f << 0.01 * i << "	" << standFormant2Vec[i]<< "	" << standFormant3Vec[i] << endl;
+	}
+
+	//file write to outfilename, intensity
+	outfile_i << "time" << "	" << "intensity" << endl;
+	for (int i = 0; i < vecSize; i++)
+	{
+		outfile_i << 0.01 * i << "	" << standIntensityVec[i] << endl;
+	}
+
+	//file descriptor close
+	outfile_p.close();
+	outfile_f.close();
+	outfile_i.close();
 }
