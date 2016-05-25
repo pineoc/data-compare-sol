@@ -10,9 +10,9 @@ using namespace std;
 
 #include "dataList.h"
 
-#define RAW_PITCH_COMPARE_DIFF 5.0f
+#define RAW_PITCH_COMPARE_DIFF 10.0f
 #define RAW_FORMANT_COMPARE_DIFF 20.0f
-#define RAW_INTENSITY_COMPARE_DIFF 5.0f
+#define RAW_INTENSITY_COMPARE_DIFF 10.0f
 
 struct formantCompResultType {
 	double func2Res;

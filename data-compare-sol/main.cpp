@@ -128,6 +128,8 @@ int main(int argc, char* argv[])
 			raw_formant2_rate = 0.0;
 		if (isnan(raw_formant3_rate))
 			raw_formant3_rate = 0.0;
+		if (isnan(pitch_avg))
+			pitch_avg = 0.0;
 
 		cout << "{ \"pitch_rate\": " << raw_pitch_rate << ",";
 		cout << "\"pitch_avg\": " << pitch_avg << ",";
@@ -159,6 +161,8 @@ int main(int argc, char* argv[])
 			cosine_f2_rate = 0.0;
 		if (isnan(cosine_f3_rate))
 			cosine_f3_rate = 0.0;
+		if (isnan(pitch_avg))
+			pitch_avg = 0.0;
 
 		cout << "{ \"pitch_rate\": " << cosine_pitch_rate << ",";
 		cout << "\"pitch_avg\": " << pitch_avg << ",";
@@ -179,28 +183,75 @@ int main(int argc, char* argv[])
 		//median filtering
 		oCompare->median_function();
 
-		//print to stdout
-		double cosine_pitch_rate = oCompare->cosine_compare_pitch();
-		double cosine_int_rate = oCompare->cosine_compare_intensity();
-		auto cosine_f_rate = oCompare->cosine_compare_formant();
-		double cosine_f2_rate = cosine_f_rate.func2Res;
-		double cosine_f3_rate = cosine_f_rate.func3Res;
 		double pitch_avg = oCompare->pitch_average_compare();
-		if (isnan(cosine_pitch_rate))
-			cosine_pitch_rate = 0.0;
-		if (isnan(cosine_int_rate))
-			cosine_int_rate = 0.0;
-		if (isnan(cosine_f2_rate))
-			cosine_f2_rate = 0.0;
-		if (isnan(cosine_f3_rate))
-			cosine_f3_rate = 0.0;
 
-		cout << "{ \"pitch_rate\": " << cosine_pitch_rate << ",";
-		cout << "\"pitch_avg\": " << pitch_avg << ",";
-		cout << "\"int_rate\": " << cosine_int_rate << ",";
-		cout << "\"f2_rate\": " << cosine_f2_rate << ",";
-		cout << "\"f3_rate\": " << cosine_f3_rate << " }";
+		//median filtering + data block parsing + cosine similarity
+		if (oCompare->makeDataList())
+		{//make dataList success
+		 //print to stdout
+			double cosine_pitch_rate = oCompare->block_cosine_compare_pitch();
+			double cosine_int_rate = oCompare->block_cosine_compare_intensity();
+			auto cosine_f_rate = oCompare->block_cosine_compare_formant();
+			double cosine_f2_rate = cosine_f_rate.func2Res;
+			double cosine_f3_rate = cosine_f_rate.func3Res;
 
+			if (isnan(cosine_pitch_rate))
+				cosine_pitch_rate = 0.0;
+			if (isnan(cosine_int_rate))
+				cosine_int_rate = 0.0;
+			if (isnan(cosine_f2_rate))
+				cosine_f2_rate = 0.0;
+			if (isnan(cosine_f3_rate))
+				cosine_f3_rate = 0.0;
+			if (isnan(pitch_avg))
+				pitch_avg = 0.0;
+
+			cout << "{ \"pitch_rate\": " << cosine_pitch_rate << ",";
+			cout << "\"pitch_avg\": " << pitch_avg << ",";
+			cout << "\"int_rate\": " << cosine_int_rate << ",";
+			cout << "\"f2_rate\": " << cosine_f2_rate << ",";
+			cout << "\"f3_rate\": " << cosine_f3_rate << ",";
+			cout << "\"stand_block_num_a\": " << oCompare->getStandDataList().getDataList().size() << ",";
+			cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
+			cout << "\"stand_block_num\": " << oCompare->getInterpolatedStandVec().getDataList().size() << ",";
+			cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
+			if (f1_num == '3')
+			{//check attendance
+				cout << "\"data_valid\": " << 0 << " }";
+			}
+			else
+			{//combine data
+			 //corr data set
+			 //true or false?
+				if (pitch_avg > 80.0
+					&& cosine_pitch_rate > 80.0
+					&& cosine_int_rate > 80.0
+					&& cosine_f2_rate > 90.0
+					&& cosine_f3_rate > 90.0)
+				{
+					//true
+					oCompare->combineData(argv[2]);
+					cout << "\"data_valid\": " << 1 << " }";
+				}
+				else
+				{
+					cout << "\"data_valid\": " << -1 << " }";
+				}
+			}
+		}
+		else
+		{//make dataList fail
+			cout << "{ \"pitch_rate\": " << 0.0 << ",";
+			cout << "\"pitch_avg\": " << pitch_avg << ",";
+			cout << "\"int_rate\": " << 0.0 << ",";
+			cout << "\"f2_rate\": " << 0.0 << ",";
+			cout << "\"f3_rate\": " << 0.0 << ",";
+			cout << "\"stand_block_num_a\": " << oCompare->getStandDataList().getDataList().size() << ",";
+			cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
+			cout << "\"stand_block_num\": " << oCompare->getInterpolatedStandVec().getDataList().size() << ",";
+			cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
+			cout << "\"data_valid\": " << -1 << " }";
+		}
 	}
 	else if (argv3 == "block_cosine")
 	{
@@ -213,7 +264,7 @@ int main(int argc, char* argv[])
 		oCompare->setPitchData();
 
 		//median filtering
-		oCompare->median_function();
+		//oCompare->median_function();
 
 		double pitch_avg = oCompare->pitch_average_compare();
 
@@ -259,7 +310,7 @@ int main(int argc, char* argv[])
 					&& cosine_f3_rate > 90.0)
 				{
 					//true
-					oCompare->combineData(argv[2]);
+					//oCompare->combineData(argv[2]);
 					cout << "\"data_valid\": " << 1 << " }";
 				}
 				else
