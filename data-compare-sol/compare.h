@@ -57,7 +57,8 @@ public:
 
 	//read pitch file, insert to pitch vector(stand, comp)
 	void setPitchData();
-	vector<double> getPitchData();
+	vector<double> getStandPitchData();
+	vector<double> getCompPitchData();
 
 	//read formant file, insert to formant vector(stand, comp)
 	void setFormantData();
@@ -65,7 +66,14 @@ public:
 
 	//read intencity file, insert to intencity vector(stand, comp)
 	void setIntensityData();
-	vector<double> getIntensityData();
+	vector<double> getStandIntensityData();
+	vector<double> getCompIntensityData();
+
+	dataList getStandDataList();
+	dataList getCompDataList();
+
+	dataList getInterpolatedStandVec();
+	dataList getInterpolatedCompVec();
 
 	//raw compare functions
 	double raw_compare_pitch();
@@ -82,9 +90,7 @@ public:
 	double cosine_compare_intensity();
 
 	//Euclidean distance
-	//double euclidean_compare_pitch();
-	//formantCompResultType euclidean_compare_formant();
-	//double euclidean_compare_intensity();
+	double euclidean_compare(vector<double> v1, vector<double> v2);
 
 	//based blockList compare, cosine similarity
 	double block_cosine_compare_pitch();

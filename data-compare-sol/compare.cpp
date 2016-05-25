@@ -81,9 +81,13 @@ void compare::setPitchData()
 	}
 }
 
-vector<double> compare::getPitchData()
+vector<double> compare::getStandPitchData()
 {
 	return standPitchVec;
+}
+vector<double> compare::getCompPitchData()
+{
+	return compPitchVec;
 }
 
 void compare::setFormantData()
@@ -185,9 +189,32 @@ void compare::setIntensityData()
 	}
 }
 
-vector<double> compare::getIntensityData()
+vector<double> compare::getStandIntensityData()
 {
 	return standIntensityVec;
+}
+vector<double> compare::getCompIntensityData()
+{
+	return compIntensityVec;
+}
+dataList compare::getStandDataList()
+{
+	return *standDL;
+}
+
+dataList compare::getCompDataList()
+{
+	return *compDL;
+}
+
+dataList compare::getInterpolatedStandVec()
+{
+	return interp_stand;
+}
+
+dataList compare::getInterpolatedCompVec()
+{
+	return interp_comp;
 }
 
 double compare::raw_compare_pitch()
@@ -270,7 +297,7 @@ double compare::raw_compare_intensity()
 
 	for (int i = 0; i < min; i++)
 	{
-		//male-10 < female < male+10 ? check similar.
+		//male-10 < female < male + 10 ? check similar.
 		if (abs(standIntensityVec[i] - compIntensityVec[i]) < RAW_INTENSITY_COMPARE_DIFF)
 			correctCnt++;
 	}
@@ -388,44 +415,29 @@ double compare::cosine_compare_intensity()
 	similarityValue = topValue / bottomValue;
 	return similarityValue * 100;
 }
-/*
-double compare::euclidean_compare_pitch()
+
+double compare::euclidean_compare(vector<double> v1, vector<double> v2)
 {
 	double value1 = 0.0;
 	double result = 0.0;
+	vector<double> tmpVec1, tmpVec2;
+	tmpVec1 = v1;
+	tmpVec2 = v2;
+	if (v1.size() > v2.size())
+		tmpVec2 = interpolation(tmpVec2, v1.size());
+	else
+		tmpVec1 = interpolation(tmpVec1, v2.size());
 
-	int vecLength = min(standPitchVec.size(), compPitchVec.size());
+	int vecLength = tmpVec1.size();
 
 	//sum of pow2, (p-q)^2
 	for (int i = 0; i < vecLength; i++)
-		value1 += pow((standPitchVec[i] - compPitchVec[i]), 2);
+		value1 += pow((tmpVec1[i] - tmpVec2[i]), 2);
 
 	result = sqrt(value1);
 	result = 1.0 / (1.0 + result) * 100;
 	return result;
 }
-
-formantCompResultType compare::euclidean_compare_formant()
-{
-	return formantCompResultType();
-}
-
-double compare::euclidean_compare_intensity()
-{
-	double value1 = 0.0;
-	double result = 0.0;
-
-	int vecLength = min(standIntencityVec.size(), compIntencityVec.size());
-
-	//sum of pow2, (p-q)^2
-	for (int i = 0; i < vecLength; i++)
-		value1 += pow((standIntencityVec[i] - compIntencityVec[i]), 2);
-
-	result = sqrt(value1);
-
-	return 1.0 / (1.0 + result) * 100;
-}
-*/
 
 double compare::block_cosine_compare_pitch()
 {

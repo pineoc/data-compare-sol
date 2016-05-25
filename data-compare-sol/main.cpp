@@ -25,8 +25,8 @@ int main(int argc, char* argv[])
 	{ // cpp test dev version sequence
 		//you should register two data and update this strings
 		string dir = "";
-		string file1 = dir + "test4/test4.wav";
-		string file2 = dir + "test3/test3.wav";
+		string file1 = dir + "test3/test3.wav";
+		string file2 = dir + "test4/test4.wav";
 
 		//compare regi1 regi2
 		compare* oCompare = new compare(file1, file2);
@@ -52,6 +52,13 @@ int main(int argc, char* argv[])
 		cout << "cosine compare formant" << endl;
 		cout << "func2: " << oCompare->cosine_compare_formant().func2Res << endl;
 		cout << "func3: " << oCompare->cosine_compare_formant().func3Res << endl;
+		cout << endl;
+
+		cout << "===========[all stream] euclidean similarity check===============" << endl;
+		cout << "euclidean compare pitch: " << 
+			oCompare->euclidean_compare(oCompare->getStandPitchData(), oCompare->getCompPitchData()) << endl;
+		cout << "euclidean compare intensity: " << 
+			oCompare->euclidean_compare(oCompare->getStandIntensityData(), oCompare->getCompIntensityData()) << endl;
 		cout << endl;
 
 		//result
@@ -233,8 +240,10 @@ int main(int argc, char* argv[])
 			cout << "\"int_rate\": " << cosine_int_rate << ",";
 			cout << "\"f2_rate\": " << cosine_f2_rate << ",";
 			cout << "\"f3_rate\": " << cosine_f3_rate << ",";
-
-
+			cout << "\"stand_block_num_a\": " << oCompare->getStandDataList().getDataList().size() << ",";
+			cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
+			cout << "\"stand_block_num\": "<< oCompare->getInterpolatedStandVec().getDataList().size() << ",";
+			cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
 			if (f1_num == '3')
 			{//check attendance
 				cout << "\"data_valid\": " << 0 << " }";
@@ -266,6 +275,10 @@ int main(int argc, char* argv[])
 			cout << "\"int_rate\": " << 0.0 << ",";
 			cout << "\"f2_rate\": " << 0.0 << ",";
 			cout << "\"f3_rate\": " << 0.0 << ",";
+			cout << "\"stand_block_num_a\": " << oCompare->getStandDataList().getDataList().size() << ",";
+			cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
+			cout << "\"stand_block_num\": " << oCompare->getInterpolatedStandVec().getDataList().size() << ",";
+			cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
 			cout << "\"data_valid\": " << -1 << " }";
 		}
 	}
