@@ -230,7 +230,7 @@ int main(int argc, char* argv[])
 					&& cosine_f3_rate > 90.0)
 				{
 					//true
-					oCompare->combineData(argv[2]);
+					//oCompare->combineData(argv[2]);
 					cout << "\"data_valid\": " << 1 << " }";
 				}
 				else
