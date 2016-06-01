@@ -99,6 +99,7 @@ public:
 
 	//get cosine similarity value of two vectors
 	double getCosineSimilarity(vector<double> v1, vector<double> v2);
+	double getCosineSimilarityEnhanced(vector<double> v1, vector<double> v2);
 
 	//median filtering
 	void median_function();

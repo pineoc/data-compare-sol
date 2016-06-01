@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <chrono>
 #include "compare.h"
 using namespace std;
 
@@ -24,6 +25,9 @@ int main(int argc, char* argv[])
 	if (argv3 == "")
 	{ // cpp test dev version sequence
 		//you should register two data and update this strings
+		//start timer
+		std::chrono::steady_clock::time_point begin;
+		std::chrono::steady_clock::time_point end;
 		string dir = "";
 		string file1 = dir + "test3/test3.wav";
 		string file2 = dir + "test4/test4.wav";
@@ -54,13 +58,6 @@ int main(int argc, char* argv[])
 		cout << "func3: " << oCompare->cosine_compare_formant().func3Res << endl;
 		cout << endl;
 
-		cout << "===========[all stream] euclidean similarity check===============" << endl;
-		cout << "euclidean compare pitch: " << 
-			oCompare->euclidean_compare(oCompare->getStandPitchData(), oCompare->getCompPitchData()) << endl;
-		cout << "euclidean compare intensity: " << 
-			oCompare->euclidean_compare(oCompare->getStandIntensityData(), oCompare->getCompIntensityData()) << endl;
-		cout << endl;
-
 		//result
 		double pitch_avg;
 		double pitch, intensity, formant2, formant3;
@@ -68,6 +65,7 @@ int main(int argc, char* argv[])
 		oCompare->median_function();
 
 		//make data list
+		begin = std::chrono::steady_clock::now();
 		cout << "===========[block] cosine similarity check===============" << endl;
 		if (oCompare->makeDataList())
 		{//make dataList success
@@ -101,6 +99,10 @@ int main(int argc, char* argv[])
 			cout << "make datalist fail" << endl;
 		}
 		cout << endl;
+		end = std::chrono::steady_clock::now();
+		//end timer
+		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;
+		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << std::endl;
 	}
 #if(DEBUG == 0)
 	else if (argv3 == "raw")

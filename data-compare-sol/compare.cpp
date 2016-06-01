@@ -49,7 +49,7 @@ void compare::setPitchData()
 
 			//push to vector
 			standPitchVec.push_back(atof(point.c_str()));
-			
+
 		}
 
 	}
@@ -159,9 +159,9 @@ void compare::setIntensityData()
 			{
 				point = "0";
 			}
-			
+
 			standIntensityVec.push_back(atof(point.c_str()));
-			
+
 		}
 
 	}
@@ -267,14 +267,14 @@ formantCompResultType compare::raw_compare_formant()
 	//formant functions compare
 	for (int i = 0; i < vecLength; i++)
 	{
-		
+
 		//function2 compare
 		if (abs(standFormant2Vec[i] - compFormant2Vec[i]) < RAW_FORMANT_COMPARE_DIFF)
 			correctCnt2++;
 		//function3 compare
 		if (abs(standFormant3Vec[i] - compFormant3Vec[i]) < RAW_FORMANT_COMPARE_DIFF)
 			correctCnt3++;
-		
+
 	}
 
 	result.func2Res = (double)correctCnt2 / (double)vecLength * 100;
@@ -461,7 +461,7 @@ formantCompResultType compare::block_cosine_compare_formant()
 {
 	//get datalist size
 	int comp_vec_size = interp_stand.getDataList().size();
-	formantCompResultType result = {0.0, 0.0};
+	formantCompResultType result = { 0.0, 0.0 };
 
 	//compare start
 	for (int i = 0; i < comp_vec_size; i++)
@@ -520,6 +520,18 @@ double compare::getCosineSimilarity(vector<double> v1, vector<double> v2)
 	return similarityValue * 100;
 }
 
+double compare::getCosineSimilarityEnhanced(vector<double> v1, vector<double> v2)
+{
+	unsigned int vectorLength = v2.size();
+	double dot = 0.0, denom_a = 0.0, denom_b = 0.0;
+	for (unsigned int i = 0u; i < vectorLength; ++i) {
+		dot += v1[i] * v2[i];
+		denom_a += v1[i] * v1[i];
+		denom_b += v2[i] * v2[i];
+	}
+	return dot / (sqrt(denom_a) * sqrt(denom_b));
+}
+
 void compare::median_function()
 {
 	double filter[5];
@@ -540,7 +552,7 @@ void compare::median_function()
 		tmpVec[i + 2] = filter[2];
 	}
 	compPitchVec = tmpVec;
-	
+
 	//intensity median
 	tmpVec.clear();
 	tmpVec.assign(compIntensityVec.size(), 0.0);
@@ -583,7 +595,7 @@ void compare::median_function()
 		filter[0] = compFormant3Vec[i];
 		filter[1] = compFormant3Vec[i + 1];
 		filter[2] = compFormant3Vec[i + 2];
-		
+
 		sort(filter, filter + 3);
 		tmpVec[i + 1] = filter[1];
 	}
@@ -618,7 +630,7 @@ double compare::pitch_average_compare()
 		{
 			std_pitch_average += standPitchVec[i];
 			count++;
-		}			
+		}
 	}
 
 	std_pitch_average = (std_pitch_average / count);
@@ -632,13 +644,13 @@ double compare::pitch_average_compare()
 		{
 			cmp_pitch_average += compPitchVec[i];
 			count++;
-		}		
+		}
 	}
 
 	cmp_pitch_average = (cmp_pitch_average / count);
 
 	//correctness
-	if(cmp_pitch_average > std_pitch_average)
+	if (cmp_pitch_average > std_pitch_average)
 		return (std_pitch_average / cmp_pitch_average) * 100;
 	else
 		return (cmp_pitch_average / std_pitch_average) * 100;
@@ -682,7 +694,7 @@ vector<double> compare::interpolation(vector<double> _vector, int size)
 			d1 = j - k;
 			//find p2
 			k = j;
-			while (temp[k] == -1 && k < size-1)
+			while (temp[k] == -1 && k < size - 1)
 			{
 				k++;
 			}
@@ -715,7 +727,7 @@ bool compare::getInterpolatedVector(dataList stand, dataList comp)
 	vector<double> tmpF3;
 
 	//two list size must be same
-	if (s_stand == s_comp) 
+	if (s_stand == s_comp)
 	{
 		for (i = 0; i < s_stand; i++)
 		{
@@ -726,7 +738,7 @@ bool compare::getInterpolatedVector(dataList stand, dataList comp)
 			//make new block after interpolation
 			Data s_newData;
 			Data c_newData;
-			
+
 			////pitch
 			s_std_blk = s_data.getPitchVec().size();
 			s_comp_blk = c_data.getPitchVec().size();
@@ -739,7 +751,7 @@ bool compare::getInterpolatedVector(dataList stand, dataList comp)
 				s_newData.setPitchVec(tmpPitch);
 				c_newData.setPitchVec(c_data.getPitchVec());
 			}
-			else 
+			else
 			{
 				//interpolation compared pitch
 				tmpPitch = interpolation(c_data.getPitchVec(), s_std_blk);
@@ -831,7 +843,7 @@ double compare::round(double value)
 {
 	double temp;
 	temp = value*pow(10, 1);
-	temp = floor(temp+0.5);
+	temp = floor(temp + 0.5);
 	temp *= pow(10, -1);
 	return temp;
 }
@@ -945,7 +957,7 @@ void compare::combineData(string outFileName)
 	outfile_f << "time" << "	" << "f2" << "	" << "f3" << endl;
 	for (int i = 0; i < vecSize; i++)
 	{
-		outfile_f << 0.01 * i << "	" << standFormant2Vec[i]<< "	" << standFormant3Vec[i] << endl;
+		outfile_f << 0.01 * i << "	" << standFormant2Vec[i] << "	" << standFormant3Vec[i] << endl;
 	}
 
 	//file write to outfilename, intensity
