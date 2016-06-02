@@ -26,21 +26,25 @@ private:
 	ifstream standardPitchFile;
 	ifstream standardFormantFile;
 	ifstream standardIntensityFile;
+	ifstream standardMFCCFile;
 
 	vector<double> standPitchVec;
 	vector<double> standFormant2Vec;
 	vector<double> standFormant3Vec;
 	vector<double> standIntensityVec;
+	vector<double> standMFCCVec;
 
 	//compare audio data file
 	ifstream compPitchFile;
 	ifstream compFormantFile;
 	ifstream compIntensityFile;
+	ifstream compMFCCFile;
 
 	vector<double> compPitchVec;
 	vector<double> compFormant2Vec;
 	vector<double> compFormant3Vec;
 	vector<double> compIntensityVec;
+	vector<double> compMFCCVec;
 
 	//before interpolate dataList
 	dataList* standDL;
@@ -68,6 +72,14 @@ public:
 	void setIntensityData();
 	vector<double> getStandIntensityData();
 	vector<double> getCompIntensityData();
+
+	//read MFCC file, insert to MFCC vector(stand, comp)
+	void setMFCCData();
+	vector<double> getStandMFCCData();
+	vector<double> getCompMFCCData();
+	//set MFCC vector interpolate
+	void setMFCCInterpolate();
+	int getDTWDistance(vector<double> v1, vector<double> v2);
 
 	dataList getStandDataList();
 	dataList getCompDataList();
@@ -104,7 +116,7 @@ public:
 	//median filtering
 	void median_function();
 
-	//cmompare pitch average
+	//compare pitch average
 	double pitch_average_compare();
 
 	//DataList logic functions

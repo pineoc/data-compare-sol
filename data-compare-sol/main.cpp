@@ -4,7 +4,7 @@
 #include "compare.h"
 using namespace std;
 
-#define DEBUG 0
+#define DEBUG 1
 
 int main(int argc, char* argv[])
 {
@@ -39,6 +39,7 @@ int main(int argc, char* argv[])
 		oCompare->setFormantData();
 		oCompare->setIntensityData();
 		oCompare->setPitchData();
+		oCompare->setMFCCData();
 
 		//compare
 		cout << "===========[all stream] raw similarity check===============" << endl;
@@ -99,6 +100,13 @@ int main(int argc, char* argv[])
 			cout << "make datalist fail" << endl;
 		}
 		cout << endl;
+
+		//mfcc compare
+		//set mfcc vector interpolate for cosine similarity check
+		oCompare->setMFCCInterpolate();
+		cout << "mfcc cosine similarity: " << 
+			oCompare->getCosineSimilarityEnhanced(oCompare->getStandMFCCData(), oCompare->getCompMFCCData()) << endl;
+
 		end = std::chrono::steady_clock::now();
 		//end timer
 		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;
@@ -348,7 +356,7 @@ int main(int argc, char* argv[])
 	}
 	else if (argv3 == "mfcc")
 	{
-
+		compare* oCompare = new compare(argv[1], argv[2]);
 	}
 #endif
 
