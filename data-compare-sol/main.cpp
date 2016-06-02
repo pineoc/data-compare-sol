@@ -29,8 +29,8 @@ int main(int argc, char* argv[])
 		std::chrono::steady_clock::time_point begin;
 		std::chrono::steady_clock::time_point end;
 		string dir = "";
-		string file1 = dir + "test3/test3.wav";
-		string file2 = dir + "test4/test4.wav";
+		string file1 = dir + "test1/test1";
+		string file2 = dir + "test2/test2";
 
 		//compare regi1 regi2
 		compare* oCompare = new compare(file1, file2);
@@ -102,7 +102,6 @@ int main(int argc, char* argv[])
 		end = std::chrono::steady_clock::now();
 		//end timer
 		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;
-		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << std::endl;
 	}
 #if(DEBUG == 0)
 	else if (argv3 == "raw")
@@ -257,7 +256,11 @@ int main(int argc, char* argv[])
 	}
 	else if (argv3 == "block_cosine")
 	{
-		//median + cosine similarity
+		//value for process time check
+		std::chrono::steady_clock::time_point t_begin;
+		std::chrono::steady_clock::time_point t_end;
+		t_begin = std::chrono::steady_clock::now();
+		//block cosine similarity
 		compare* oCompare = new compare(argv[1], argv[2]);
 
 		//set data to array
@@ -288,6 +291,10 @@ int main(int argc, char* argv[])
 				cosine_f2_rate = 0.0;
 			if (isnan(cosine_f3_rate))
 				cosine_f3_rate = 0.0;
+
+			//time end set
+			t_end = std::chrono::steady_clock::now();
+
 			cout << "{ \"pitch_rate\": " << cosine_pitch_rate << ",";
 			cout << "\"pitch_avg\": " << pitch_avg << ",";
 			cout << "\"int_rate\": " << cosine_int_rate << ",";
@@ -297,6 +304,7 @@ int main(int argc, char* argv[])
 			cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
 			cout << "\"stand_block_num\": "<< oCompare->getInterpolatedStandVec().getDataList().size() << ",";
 			cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
+			cout << "\"proc_time\": " << std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_begin).count() << ",";
 			if (f1_num == '3')
 			{//check attendance
 				cout << "\"data_valid\": " << 0 << " }";
@@ -323,6 +331,8 @@ int main(int argc, char* argv[])
 		}
 		else
 		{//make dataList fail
+			//end time make data list fail
+			t_end = std::chrono::steady_clock::now();
 			cout << "{ \"pitch_rate\": " << 0.0 << ",";
 			cout << "\"pitch_avg\": " << pitch_avg << ",";
 			cout << "\"int_rate\": " << 0.0 << ",";
@@ -332,8 +342,13 @@ int main(int argc, char* argv[])
 			cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
 			cout << "\"stand_block_num\": " << oCompare->getInterpolatedStandVec().getDataList().size() << ",";
 			cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
+			cout << "\"proc_time\": " << std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_begin).count() << ",";
 			cout << "\"data_valid\": " << -1 << " }";
 		}
+	}
+	else if (argv3 == "mfcc")
+	{
+
 	}
 #endif
 
