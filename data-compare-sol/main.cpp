@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
 			cout << "cosine compare formant f3: " << formant3 << endl;
 			cout << "pitch avg rate: " << pitch_avg << endl;
 			//true or false?
-			if (pitch_avg > 90.0
+			if (pitch_avg > 80.0
 				&& pitch > 80.0
 				&& intensity > 80.0
 				&& formant2 > 90.0
@@ -257,6 +257,11 @@ int main(int argc, char* argv[])
 	}
 	else if (argv3 == "block_cosine")
 	{
+		//processing time set
+		std::chrono::steady_clock::time_point begin;
+		std::chrono::steady_clock::time_point end;
+		//processing time begin
+		begin = std::chrono::steady_clock::now();
 		//median + cosine similarity
 		compare* oCompare = new compare(argv[1], argv[2]);
 
@@ -297,6 +302,9 @@ int main(int argc, char* argv[])
 			cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
 			cout << "\"stand_block_num\": "<< oCompare->getInterpolatedStandVec().getDataList().size() << ",";
 			cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
+			end = std::chrono::steady_clock::now();
+			//end timer
+			std::cout << "\"proc_time\": " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << ",";
 			if (f1_num == '3')
 			{//check attendance
 				cout << "\"data_valid\": " << 0 << " }";
@@ -332,6 +340,9 @@ int main(int argc, char* argv[])
 			cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
 			cout << "\"stand_block_num\": " << oCompare->getInterpolatedStandVec().getDataList().size() << ",";
 			cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
+			end = std::chrono::steady_clock::now();
+			//end timer
+			std::cout << "\"proc_time\": " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << ",";
 			cout << "\"data_valid\": " << -1 << " }";
 		}
 	}
