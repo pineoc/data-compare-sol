@@ -4,6 +4,7 @@
 #include "compare.h"
 using namespace std;
 
+
 #define DEBUG 0
 
 int main(int argc, char* argv[])
@@ -28,9 +29,12 @@ int main(int argc, char* argv[])
 		//start timer
 		std::chrono::steady_clock::time_point begin;
 		std::chrono::steady_clock::time_point end;
-		string dir = "";
-		string file1 = dir + "test3/test3.wav";
-		string file2 = dir + "test4/test4.wav";
+		//test1/ -> test1-1, test1-2, test1-3 is same person speak(female, LJY)
+		//test2/test2 -> (male, LYS)
+		//test3/test3 -> (female, GDY)
+		//test4/test4 -> (male, LWH)
+		string file1 = "test2/test2-2";
+		string file2 = "test4/test4";
 
 		//compare regi1 regi2
 		compare* oCompare = new compare(file1, file2);
@@ -39,6 +43,7 @@ int main(int argc, char* argv[])
 		oCompare->setFormantData();
 		oCompare->setIntensityData();
 		oCompare->setPitchData();
+		oCompare->setMFCCData();
 
 		//compare
 		cout << "===========[all stream] raw similarity check===============" << endl;
@@ -99,10 +104,18 @@ int main(int argc, char* argv[])
 			cout << "make datalist fail" << endl;
 		}
 		cout << endl;
+
+		//mfcc compare
+		//set mfcc vector interpolate for cosine similarity check
+		/*
+		oCompare->setMFCCInterpolate();
+		cout << "mfcc cosine similarity: " << 
+			oCompare->getCosineSimilarityEnhanced(oCompare->getStandMFCCData(), oCompare->getCompMFCCData()) << endl;*/
+		cout << "mfcc dtw algorithm value: " << oCompare->getDTWDistance(oCompare->getStandMFCCData(), oCompare->getCompMFCCData()) << endl;
+
 		end = std::chrono::steady_clock::now();
 		//end timer
 		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;
-		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << std::endl;
 	}
 #if(DEBUG == 0)
 	else if (argv3 == "raw")
@@ -257,12 +270,11 @@ int main(int argc, char* argv[])
 	}
 	else if (argv3 == "block_cosine")
 	{
-		//processing time set
-		std::chrono::steady_clock::time_point begin;
-		std::chrono::steady_clock::time_point end;
-		//processing time begin
-		begin = std::chrono::steady_clock::now();
-		//median + cosine similarity
+		//value for process time check
+		std::chrono::steady_clock::time_point t_begin;
+		std::chrono::steady_clock::time_point t_end;
+		t_begin = std::chrono::steady_clock::now();
+		//block cosine similarity
 		compare* oCompare = new compare(argv[1], argv[2]);
 
 		//set data to array
@@ -293,6 +305,10 @@ int main(int argc, char* argv[])
 				cosine_f2_rate = 0.0;
 			if (isnan(cosine_f3_rate))
 				cosine_f3_rate = 0.0;
+
+			//time end set
+			t_end = std::chrono::steady_clock::now();
+
 			cout << "{ \"pitch_rate\": " << cosine_pitch_rate << ",";
 			cout << "\"pitch_avg\": " << pitch_avg << ",";
 			cout << "\"int_rate\": " << cosine_int_rate << ",";
@@ -302,9 +318,7 @@ int main(int argc, char* argv[])
 			cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
 			cout << "\"stand_block_num\": "<< oCompare->getInterpolatedStandVec().getDataList().size() << ",";
 			cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
-			end = std::chrono::steady_clock::now();
-			//end timer
-			std::cout << "\"proc_time\": " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << ",";
+			cout << "\"proc_time\": " << std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_begin).count() << ",";
 			if (f1_num == '3')
 			{//check attendance
 				cout << "\"data_valid\": " << 0 << " }";
@@ -331,6 +345,8 @@ int main(int argc, char* argv[])
 		}
 		else
 		{//make dataList fail
+			//end time make data list fail
+			t_end = std::chrono::steady_clock::now();
 			cout << "{ \"pitch_rate\": " << 0.0 << ",";
 			cout << "\"pitch_avg\": " << pitch_avg << ",";
 			cout << "\"int_rate\": " << 0.0 << ",";
@@ -340,11 +356,13 @@ int main(int argc, char* argv[])
 			cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
 			cout << "\"stand_block_num\": " << oCompare->getInterpolatedStandVec().getDataList().size() << ",";
 			cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
-			end = std::chrono::steady_clock::now();
-			//end timer
-			std::cout << "\"proc_time\": " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << ",";
+			cout << "\"proc_time\": " << std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_begin).count() << ",";
 			cout << "\"data_valid\": " << -1 << " }";
 		}
+	}
+	else if (argv3 == "mfcc")
+	{
+		compare* oCompare = new compare(argv[1], argv[2]);
 	}
 #endif
 

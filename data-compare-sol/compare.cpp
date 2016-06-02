@@ -14,11 +14,13 @@ compare::compare(string standardDataFilename, string compareDataFilename)
 	standardPitchFile = ifstream(string(standardDataFilename + "-p.out"));
 	standardFormantFile = ifstream(string(standardDataFilename + "-f.out"));
 	standardIntensityFile = ifstream(string(standardDataFilename + "-i.out"));
+	standardMFCCFile = ifstream(string(standardDataFilename + "-mfcc.out"));
 
 	//compare file open
 	compPitchFile = ifstream(string(compareDataFilename + "-p.out"));
 	compFormantFile = ifstream(string(compareDataFilename + "-f.out"));
 	compIntensityFile = ifstream(string(compareDataFilename + "-i.out"));
+	compMFCCFile = ifstream(string(compareDataFilename + "-mfcc.out"));
 }
 
 
@@ -196,6 +198,105 @@ vector<double> compare::getStandIntensityData()
 vector<double> compare::getCompIntensityData()
 {
 	return compIntensityVec;
+}
+void compare::setMFCCData()
+{
+	//read from file standard mfcc data
+	if (standardMFCCFile.is_open())
+	{
+		while (!standardMFCCFile.eof())
+		{
+			//file read
+			string time, point;
+			standardMFCCFile >> time >> point;
+
+			//if pitch
+			if (!point.compare("c0"))
+				continue;
+
+			if (!point.compare("--undefined--"))
+			{
+				point = "0";
+			}
+
+			//push to vector
+			standMFCCVec.push_back(atof(point.c_str()));
+		}
+	}
+
+	//read from file compare mfcc data
+	if (compMFCCFile.is_open())
+	{
+		while (!compMFCCFile.eof())
+		{
+			//file read
+			string time, point;
+			compMFCCFile >> time >> point;
+
+			//set 0 - --undefined-- pitch
+			//if c0
+			if (!point.compare("c0"))
+				continue;
+
+			if (!point.compare("--undefined--"))
+			{
+				point = "0";
+			}
+
+			//push to vector
+			compMFCCVec.push_back(atof(point.c_str()));
+		}
+	}
+}
+vector<double> compare::getStandMFCCData()
+{
+	return standMFCCVec;
+}
+vector<double> compare::getCompMFCCData()
+{
+	return compMFCCVec;
+}
+void compare::setMFCCInterpolate()
+{
+	int standVecSize = standMFCCVec.size();
+	int compVecSize = compMFCCVec.size();
+	if (standVecSize > compVecSize)
+	{
+		compMFCCVec = interpolation(compMFCCVec, standVecSize);
+	}
+	else
+	{
+		standMFCCVec = interpolation(standMFCCVec, compVecSize);
+	}
+
+}
+int compare::getDTWDistance(vector<double> v1, vector<double> v2)
+{
+	int cost = 0;
+	int v1_size = v1.size();
+	int v2_size = v2.size();
+	vector<vector<int> > arr((v1_size + 1), vector<int>((v2_size + 1), 0));
+
+	for (int i = 1; i <= v1_size; i++)
+	{
+		arr[i][0] = 10000;//infinite value
+	}
+	for (int i = 1; i <= v2_size; i++)
+	{
+		arr[0][i] = 10000;//infinite value
+	}
+	arr[0][0] = 0;
+
+	for (int i = 1; i < v1_size; i++)
+	{
+		for (int j = 1; j < v2_size; j++)
+		{
+			cost = abs(v1[i] - v2[j]);
+			arr[i][j] = cost + min({ arr[i - 1][j], arr[i][j - 1], arr[i - 1][j - 1] });
+		}
+	}
+
+	return arr[v1_size-1][v2_size-1];
 }
 dataList compare::getStandDataList()
 {
