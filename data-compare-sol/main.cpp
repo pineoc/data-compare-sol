@@ -71,53 +71,67 @@ int main(int argc, char* argv[])
 		//median filtering before make datalist
 		oCompare->median_function();
 
-		//make data list
-		begin = std::chrono::steady_clock::now();
-		cout << "===========[block] cosine similarity check===============" << endl;
-		if (oCompare->makeDataList())
-		{//make dataList success
-		 //block compare start
-			auto block_cosine_compare_f_data = oCompare->block_cosine_compare_formant();
-			pitch_avg = oCompare->pitch_average_compare();
-			pitch = oCompare->block_cosine_compare_intensity();
-			intensity = block_cosine_compare_f_data.func2Res;
-			formant2 = block_cosine_compare_f_data.func3Res;
-			formant3 = oCompare->pitch_average_compare();
-			cout << "cosine compare pitch: " << pitch << endl;
-			cout << "cosine copmare intensity: " << intensity << endl;
-			cout << "cosine compare formant f2: " << formant2 << endl;
-			cout << "cosine compare formant f3: " << formant3 << endl;
-			cout << "pitch avg rate: " << pitch_avg << endl;
-			//true or false?
-			if (pitch_avg > 80.0
-				&& pitch > 80.0
-				&& intensity > 80.0
-				&& formant2 > 90.0
-				&& formant3 > 90.0) {
-				//true
-				//oCompare->combineData(argv[2]);
-			}
-			else {
-				//false
-			}
+		//compare pitch average first
+		bool p_avg_ok = true;
+		pitch_avg = oCompare->pitch_average_compare();
+		if (pitch_avg >= 80) {
+			p_avg_ok = true;
 		}
-		else
-		{//make dataList fail
-			cout << "make datalist fail" << endl;
+		else {
+			p_avg_ok = false;
 		}
-		cout << endl;
 
-		//mfcc compare
-		//set mfcc vector interpolate for cosine similarity check
-		/*
-		oCompare->setMFCCInterpolate();
-		cout << "mfcc cosine similarity: " << 
-			oCompare->getCosineSimilarityEnhanced(oCompare->getStandMFCCData(), oCompare->getCompMFCCData()) << endl;*/
-		cout << "mfcc dtw algorithm value: " << oCompare->getDTWDistance(oCompare->getStandMFCCData(), oCompare->getCompMFCCData()) << endl;
+		//if pitch average is similar - compare continue
+		if (p_avg_ok == true) {
+			//make data list
+			begin = std::chrono::steady_clock::now();
+			cout << "===========[block] cosine similarity check===============" << endl;
+			if (oCompare->makeDataList())
+			{//make dataList success
+			 //block compare start
+				auto block_cosine_compare_f_data = oCompare->block_cosine_compare_formant();
 
-		end = std::chrono::steady_clock::now();
-		//end timer
-		std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;
+				pitch = oCompare->block_cosine_compare_intensity();
+				intensity = block_cosine_compare_f_data.func2Res;
+				formant2 = block_cosine_compare_f_data.func3Res;
+				formant3 = oCompare->pitch_average_compare();
+				cout << "cosine compare pitch: " << pitch << endl;
+				cout << "cosine copmare intensity: " << intensity << endl;
+				cout << "cosine compare formant f2: " << formant2 << endl;
+				cout << "cosine compare formant f3: " << formant3 << endl;
+				cout << "pitch avg rate: " << pitch_avg << endl;
+				//true or false?
+				if (pitch_avg > 80.0
+					&& pitch > 80.0
+					&& intensity > 80.0
+					&& formant2 > 90.0
+					&& formant3 > 90.0) {
+					//true
+					//oCompare->combineData(argv[2]);
+				}
+				else {
+					//false
+				}
+			}
+			else
+			{//make dataList fail
+				cout << "make datalist fail" << endl;
+			}
+			cout << endl;
+
+			//mfcc compare
+			//set mfcc vector interpolate for cosine similarity check
+			/*
+			oCompare->setMFCCInterpolate();
+			cout << "mfcc cosine similarity: " <<
+				oCompare->getCosineSimilarityEnhanced(oCompare->getStandMFCCData(), oCompare->getCompMFCCData()) << endl;*/
+			cout << "mfcc dtw algorithm value: " << oCompare->getDTWDistance(oCompare->getStandMFCCData(), oCompare->getCompMFCCData()) << endl;
+
+			end = std::chrono::steady_clock::now();
+			//end timer
+			std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;
+		}
+		
 	}
 #if(DEBUG == 0)
 	else if (argv3 == "raw")
