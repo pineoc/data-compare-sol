@@ -715,7 +715,7 @@ bool compare::makeDataList()
 		return false;
 }
 
-//cmompare pitch average
+//compare pitch average
 double compare::pitch_average_compare()
 {
 	//averages
