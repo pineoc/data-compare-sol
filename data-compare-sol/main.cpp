@@ -29,8 +29,8 @@ int main(int argc, char* argv[])
 		std::chrono::steady_clock::time_point begin;
 		std::chrono::steady_clock::time_point end;
 		string dir = "";
-		string file1 = dir + "test1/test1";
-		string file2 = dir + "test2/test2";
+		string file1 = dir + "test5/kk";
+		string file2 = dir + "test5/dk";
 
 		//compare regi1 regi2
 		compare* oCompare = new compare(file1, file2);
