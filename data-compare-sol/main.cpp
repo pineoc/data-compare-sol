@@ -37,7 +37,6 @@ int main(int argc, char* argv[])
 		//test5/kk,dk -> (kk file=KDY->KDY, dk file=LHD->KDY)
 		string file1 = "test5/kk";
 		string file2 = "test5/dk";
-		// c:/Users/Administrator/Desktop/capstone/attend-speaker/routes/../sound-data/test-data2/������-�ǵ���1/������-�ǵ���1.wav
 
 		//compare regi1 regi2
 		compare* oCompare = new compare(file1, file2);
