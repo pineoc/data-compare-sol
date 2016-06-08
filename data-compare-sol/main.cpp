@@ -5,7 +5,7 @@
 using namespace std;
 
 
-#define DEBUG 1
+#define DEBUG 0
 
 int main(int argc, char* argv[])
 {
@@ -35,8 +35,9 @@ int main(int argc, char* argv[])
 		//test3/test3 -> (female, KDY)
 		//test4/test4 -> (male, LWH)
 		//test5/kk,dk -> (kk file=KDY->KDY, dk file=LHD->KDY)
-		string file1 = "test5/dk";
-		string file2 = "test5/kk";
+		string file1 = "test5/kk";
+		string file2 = "test5/dk";
+		// c:/Users/Administrator/Desktop/capstone/attend-speaker/routes/../sound-data/test-data2/������-�ǵ���1/������-�ǵ���1.wav
 
 		//compare regi1 regi2
 		compare* oCompare = new compare(file1, file2);
@@ -288,6 +289,8 @@ int main(int argc, char* argv[])
 		//oCompare->median_function();
 
 		double pitch_avg = oCompare->pitch_average_compare();
+		if (isnan(pitch_avg))
+			pitch_avg = 0.0;
 
 		//median filtering + data block parsing + cosine similarity
 		if (oCompare->makeDataList())
@@ -361,10 +364,6 @@ int main(int argc, char* argv[])
 			cout << "\"proc_time\": " << std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_begin).count() << ",";
 			cout << "\"data_valid\": " << -1 << " }";
 		}
-	}
-	else if (argv3 == "mfcc")
-	{
-		compare* oCompare = new compare(argv[1], argv[2]);
 	}
 #endif
 
