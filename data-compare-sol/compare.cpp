@@ -275,27 +275,28 @@ int compare::getDTWDistance(vector<double> v1, vector<double> v2)
 	int cost = 0;
 	int v1_size = v1.size();
 	int v2_size = v2.size();
-	vector<vector<int> > arr(v1_size, vector<int>(v2_size, 0));
+	vector<vector<int> > arr((v1_size + 1), vector<int>((v2_size + 1), 0));
 
-	for (int i = 1; i < v1_size; i++)
+	for (int i = 1; i <= v1_size; i++)
 	{
 		arr[i][0] = 10000;//infinite value
 	}
-	for (int i = 1; i < v2_size; i++)
+	for (int i = 1; i <= v2_size; i++)
 	{
 		arr[0][i] = 10000;//infinite value
 	}
 	arr[0][0] = 0;
 
-	for (int i = 0; i < v1_size; i++)
+	for (int i = 1; i < v1_size; i++)
 	{
-		for (int j = 0; j < v2_size; j++)
+		for (int j = 1; j < v2_size; j++)
 		{
-
+			cost = abs(v1[i] - v2[j]);
+			arr[i][j] = cost + min({ arr[i - 1][j], arr[i][j - 1], arr[i - 1][j - 1] });
 		}
 	}
 
-	return 0;
+	return arr[v1_size-1][v2_size-1];
 }
 dataList compare::getStandDataList()
 {

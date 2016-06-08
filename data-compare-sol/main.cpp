@@ -4,6 +4,7 @@
 #include "compare.h"
 using namespace std;
 
+
 #define DEBUG 1
 
 int main(int argc, char* argv[])
@@ -28,9 +29,14 @@ int main(int argc, char* argv[])
 		//start timer
 		std::chrono::steady_clock::time_point begin;
 		std::chrono::steady_clock::time_point end;
-		string dir = "";
-		string file1 = dir + "test5/kk";
-		string file2 = dir + "test5/dk";
+
+		//test1/ -> test1-1, test1-2, test1-3 is same person speak(female, LJY)
+		//test2/test2 -> (male, LYS)
+		//test3/test3 -> (female, KDY)
+		//test4/test4 -> (male, LWH)
+		//test5/kk,dk -> (kk file=KDY->KDY, dk file=LHD->KDY)
+		string file1 = "test5/dk";
+		string file2 = "test5/kk";
 
 		//compare regi1 regi2
 		compare* oCompare = new compare(file1, file2);
@@ -83,7 +89,7 @@ int main(int argc, char* argv[])
 			cout << "cosine compare formant f3: " << formant3 << endl;
 			cout << "pitch avg rate: " << pitch_avg << endl;
 			//true or false?
-			if (pitch_avg > 90.0
+			if (pitch_avg > 80.0
 				&& pitch > 80.0
 				&& intensity > 80.0
 				&& formant2 > 90.0
@@ -103,9 +109,11 @@ int main(int argc, char* argv[])
 
 		//mfcc compare
 		//set mfcc vector interpolate for cosine similarity check
+		/*
 		oCompare->setMFCCInterpolate();
 		cout << "mfcc cosine similarity: " << 
-			oCompare->getCosineSimilarityEnhanced(oCompare->getStandMFCCData(), oCompare->getCompMFCCData()) << endl;
+			oCompare->getCosineSimilarityEnhanced(oCompare->getStandMFCCData(), oCompare->getCompMFCCData()) << endl;*/
+		cout << "mfcc dtw algorithm value: " << oCompare->getDTWDistance(oCompare->getStandMFCCData(), oCompare->getCompMFCCData()) << endl;
 
 		end = std::chrono::steady_clock::now();
 		//end timer
