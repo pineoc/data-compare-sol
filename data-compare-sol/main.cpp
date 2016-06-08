@@ -35,8 +35,8 @@ int main(int argc, char* argv[])
 		//test3/test3 -> (female, KDY)
 		//test4/test4 -> (male, LWH)
 		//test5/kk,dk -> (kk file=KDY->KDY, dk file=LHD->KDY)
-		string file1 = "test5/dk";
-		string file2 = "test5/kk";
+		string file1 = "test1/test1-1";
+		string file2 = "test1/test1-2";
 
 		//compare regi1 regi2
 		compare* oCompare = new compare(file1, file2);
