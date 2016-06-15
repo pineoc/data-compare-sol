@@ -268,7 +268,6 @@ void compare::setMFCCInterpolate()
 	{
 		standMFCCVec = interpolation(standMFCCVec, compVecSize);
 	}
-
 }
 int compare::getDTWDistance(vector<double> v1, vector<double> v2)
 {
@@ -633,74 +632,60 @@ double compare::getCosineSimilarityEnhanced(vector<double> v1, vector<double> v2
 	return dot / (sqrt(denom_a) * sqrt(denom_b));
 }
 
-void compare::median_function()
+void compare::median_function(int kernelSize)
 {
-	double filter[5];
+	vector<double> filter;
+	filter.assign(kernelSize, 0.0);
 	vector<double> tmpVec;
-	tmpVec.assign(compPitchVec.size(), 0.0);
-
-	//pitch vector median
-	int pitchSize = compPitchVec.size();
-	for (int i = 0; i < pitchSize - 4; i++)
+	tmpVec.assign(standMFCCVec.size(), 0.0);
+	int midIdx = kernelSize / 2;
+	int vSize = standMFCCVec.size();
+	for (int i = 0; i < vSize - kernelSize + 1; i++)
 	{
-		filter[0] = compPitchVec[i];
-		filter[1] = compPitchVec[i + 1];
-		filter[2] = compPitchVec[i + 2];
-		filter[3] = compPitchVec[i + 3];
-		filter[4] = compPitchVec[i + 4];
+		for (int j = 0; j < kernelSize; j++)
+			filter[j] = standMFCCVec.at(i + j);
 
-		sort(filter, filter + 5);
-		tmpVec[i + 2] = filter[2];
+		sort(filter.begin(), filter.end());
+		tmpVec[i + 1] = filter[midIdx];
 	}
-	compPitchVec = tmpVec;
+	//set to real vector
+	standMFCCVec = tmpVec;
 
-	//intensity median
-	tmpVec.clear();
-	tmpVec.assign(compIntensityVec.size(), 0.0);
-	int intensitySize = compIntensityVec.size();
-	for (int i = 0; i < intensitySize - 4; i++)
+	filter.assign(kernelSize, 0.0);
+	tmpVec.assign(compMFCCVec.size(), 0.0);
+	vSize = compMFCCVec.size();
+	for (int i = 0; i < vSize - kernelSize + 1; i++)
 	{
-		filter[0] = compIntensityVec[i];
-		filter[1] = compIntensityVec[i + 1];
-		filter[2] = compIntensityVec[i + 2];
-		filter[3] = compIntensityVec[i + 3];
-		filter[4] = compIntensityVec[i + 4];
+		for (int j = 0; j < kernelSize; j++)
+			filter[j] = compMFCCVec.at(i + j);
 
-		sort(filter, filter + 5);
-		tmpVec[i + 2] = filter[2];
+		sort(filter.begin(), filter.end());
+		tmpVec[i + 1] = filter[midIdx];
 	}
-	compIntensityVec = tmpVec;
+	//set to real vector
+	compMFCCVec = tmpVec;
+}
 
-
-	//f2 median
-	tmpVec.clear();
-	tmpVec.assign(compFormant2Vec.size(), 0.0);
-	int f2Size = compFormant2Vec.size();
-	for (int i = 0; i < f2Size - 2; i++)
+void compare::median_function(vector<double>* v1, int kernelSize)
+{
+	vector<double> filter;
+	filter.assign(kernelSize, 0.0);
+	vector<double> tmpVec;
+	tmpVec.assign(v1->size(), 0.0);
+	int midIdx = kernelSize / 2;
+	int v1Size = v1->size();
+	for (int i = 0; i < v1Size - kernelSize + 1; i++)
 	{
-		filter[0] = compFormant2Vec[i];
-		filter[1] = compFormant2Vec[i + 1];
-		filter[2] = compFormant2Vec[i + 2];
-
-		sort(filter, filter + 3);
-		tmpVec[i + 1] = filter[1];
+		for (int j = 0; j < kernelSize; j++)
+			filter[j] = v1->at(i + j);
+		
+		sort(filter.begin(), filter.end());
+		tmpVec[i + 1] = filter[midIdx];
 	}
-	compFormant2Vec = tmpVec;
 
-	//f3 median
-	tmpVec.clear();
-	tmpVec.assign(compFormant3Vec.size(), 0.0);
-	int f3Size = compFormant3Vec.size();
-	for (int i = 0; i < f3Size - 2; i++)
-	{
-		filter[0] = compFormant3Vec[i];
-		filter[1] = compFormant3Vec[i + 1];
-		filter[2] = compFormant3Vec[i + 2];
-
-		sort(filter, filter + 3);
-		tmpVec[i + 1] = filter[1];
-	}
-	compFormant3Vec = tmpVec;
+	//set to real vector
+	v1->clear();
+	v1->insert(v1->begin(), tmpVec.begin(), tmpVec.end());
 }
 
 bool compare::makeDataList()

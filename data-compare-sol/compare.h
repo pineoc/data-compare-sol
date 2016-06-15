@@ -114,7 +114,9 @@ public:
 	double getCosineSimilarityEnhanced(vector<double> v1, vector<double> v2);
 
 	//median filtering
-	void median_function();
+	void median_function(int kernelSize);
+	//general median function
+	void median_function(vector<double>* v1, int kernelSize);
 
 	//compare pitch average
 	double pitch_average_compare();

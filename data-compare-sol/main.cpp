@@ -1,11 +1,12 @@
 #include <iostream>
 #include <string>
-#include <chrono>
 #include "compare.h"
 using namespace std;
 
 
 #define DEBUG 0
+#define PITCH_COMP_VAL 80.0
+#define MFCC_COMP_VAL 20000
 
 int main(int argc, char* argv[])
 {
@@ -27,8 +28,6 @@ int main(int argc, char* argv[])
 	{ // cpp test dev version sequence
 		//you should register two data and update this strings
 		//start timer
-		std::chrono::steady_clock::time_point begin;
-		std::chrono::steady_clock::time_point end;
 
 		//test1/ -> test1-1, test1-2, test1-3 is same person speak(female, LJY)
 		//test2/test2 -> (male, LYS)
@@ -36,8 +35,8 @@ int main(int argc, char* argv[])
 		//test4/test4 -> (male, LWH)
 		//test5/kk,dk -> (kk file=KDY->KDY, dk file=LHD->KDY)
 
-		string file1 = "test1/test1-1";
-		string file2 = "test1/test1-2";
+		string file1 = "test2/test2-1";
+		string file2 = "test2/test2-2";
 
 		//compare regi1 regi2
 		compare* oCompare = new compare(file1, file2);
@@ -66,26 +65,28 @@ int main(int argc, char* argv[])
 		cout << "func3: " << oCompare->cosine_compare_formant().func3Res << endl;
 		cout << endl;
 
+		/*
 		//result
 		double pitch_avg;
 		double pitch, intensity, formant2, formant3;
 		//median filtering before make datalist
-		oCompare->median_function();
+		//oCompare->median_function();
 
+		
 		//compare pitch average first
 		bool p_avg_ok = true;
 		pitch_avg = oCompare->pitch_average_compare();
-		if (pitch_avg >= 80) {
+		if (pitch_avg >= PITCH_COMP_VAL) {
 			p_avg_ok = true;
 		}
 		else {
 			p_avg_ok = false;
 		}
+		
 
 		//if pitch average is similar - compare continue
 		if (p_avg_ok == true) {
 			//make data list
-			begin = std::chrono::steady_clock::now();
 			cout << "===========[block] cosine similarity check===============" << endl;
 			if (oCompare->makeDataList())
 			{//make dataList success
@@ -122,19 +123,120 @@ int main(int argc, char* argv[])
 
 			//mfcc compare
 			//set mfcc vector interpolate for cosine similarity check
-			/*
-			oCompare->setMFCCInterpolate();
+
+			//oCompare->setMFCCInterpolate();
+
+			//before median
 			cout << "mfcc cosine similarity: " <<
-				oCompare->getCosineSimilarityEnhanced(oCompare->getStandMFCCData(), oCompare->getCompMFCCData()) << endl;*/
+				oCompare->getCosineSimilarityEnhanced(oCompare->getStandMFCCData(), oCompare->getCompMFCCData()) << endl;
 			cout << "mfcc dtw algorithm value: " << oCompare->getDTWDistance(oCompare->getStandMFCCData(), oCompare->getCompMFCCData()) << endl;
 
-			end = std::chrono::steady_clock::now();
-			//end timer
-			std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << std::endl;
+			//median to stand MFCC
+			oCompare->median_function(3);
+
+			//after median
+			cout << "after median mfcc cosine similarity: " <<
+				oCompare->getCosineSimilarityEnhanced(oCompare->getStandMFCCData(), oCompare->getCompMFCCData()) << endl;
+			cout << "after median mfcc dtw algorithm value: " << oCompare->getDTWDistance(oCompare->getStandMFCCData(), oCompare->getCompMFCCData()) << endl;
+		}
+		*/
+
+		double pitch_avg = oCompare->pitch_average_compare();
+		if (isnan(pitch_avg))
+			pitch_avg = 0.0;
+
+		int mfccDistance = oCompare->getDTWDistance(oCompare->getStandMFCCData(), oCompare->getCompMFCCData());
+
+		//compare pitch average & mfccDistance
+		if (pitch_avg >= PITCH_COMP_VAL && mfccDistance <= MFCC_COMP_VAL)
+		{
+			//median filtering + data block parsing + cosine similarity
+			if (oCompare->makeDataList())
+			{//make dataList success
+			 //print to stdout
+				double cosine_pitch_rate = oCompare->block_cosine_compare_pitch();
+				double cosine_int_rate = oCompare->block_cosine_compare_intensity();
+				auto cosine_f_rate = oCompare->block_cosine_compare_formant();
+				double cosine_f2_rate = cosine_f_rate.func2Res;
+				double cosine_f3_rate = cosine_f_rate.func3Res;
+
+				if (isnan(cosine_pitch_rate))
+					cosine_pitch_rate = 0.0;
+				if (isnan(cosine_int_rate))
+					cosine_int_rate = 0.0;
+				if (isnan(cosine_f2_rate))
+					cosine_f2_rate = 0.0;
+				if (isnan(cosine_f3_rate))
+					cosine_f3_rate = 0.0;
+
+				cout << "{ \"pitch_rate\": " << cosine_pitch_rate << ",";
+				cout << "\"pitch_avg\": " << pitch_avg << ",";
+				cout << "\"int_rate\": " << cosine_int_rate << ",";
+				cout << "\"f2_rate\": " << cosine_f2_rate << ",";
+				cout << "\"f3_rate\": " << cosine_f3_rate << ",";
+				cout << "\"mfcc_distance\": " << mfccDistance << ",";
+				cout << "\"stand_block_num_a\": " << oCompare->getStandDataList().getDataList().size() << ",";
+				cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
+				cout << "\"stand_block_num\": " << oCompare->getInterpolatedStandVec().getDataList().size() << ",";
+				cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
+				if (true)
+				{//check attendance
+					cout << "\"data_valid\": " << 0 << " }";
+				}
+				else
+				{//combine data
+				 //corr data set
+				 //true or false?
+					if (pitch_avg > 80.0
+						&& cosine_pitch_rate > 80.0
+						&& cosine_int_rate > 80.0
+						&& cosine_f2_rate > 90.0
+						&& cosine_f3_rate > 90.0)
+					{
+						//true
+						//oCompare->combineData(argv[2]);
+						cout << "\"data_valid\": " << 1 << " }";
+					}
+					else
+					{
+						cout << "\"data_valid\": " << -1 << " }";
+					}
+				}
+			}
+			else
+			{//make dataList fail
+			 //end time make data list fail
+				cout << "{ \"pitch_rate\": " << 0.0 << ",";
+				cout << "\"pitch_avg\": " << pitch_avg << ",";
+				cout << "\"int_rate\": " << 0.0 << ",";
+				cout << "\"f2_rate\": " << 0.0 << ",";
+				cout << "\"f3_rate\": " << 0.0 << ",";
+				cout << "\"mfcc_distance\": " << mfccDistance << ",";
+				cout << "\"stand_block_num_a\": " << oCompare->getStandDataList().getDataList().size() << ",";
+				cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
+				cout << "\"stand_block_num\": " << oCompare->getInterpolatedStandVec().getDataList().size() << ",";
+				cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
+				cout << "\"data_valid\": " << -1 << " }";
+			}
+		}
+		else // no match pitch, mfcc
+		{
+			cout << "{ \"pitch_rate\": " << 0.0 << ",";
+			cout << "\"pitch_avg\": " << pitch_avg << ",";
+			cout << "\"int_rate\": " << 0.0 << ",";
+			cout << "\"f2_rate\": " << 0.0 << ",";
+			cout << "\"f3_rate\": " << 0.0 << ",";
+			cout << "\"mfcc_distance\": " << mfccDistance << ",";
+			cout << "\"stand_block_num_a\": " << 0 << ",";
+			cout << "\"comp_block_num_a\": " << 0 << ",";
+			cout << "\"stand_block_num\": " << 0 << ",";
+			cout << "\"comp_block_num\": " << 0 << ",";
+			cout << "\"data_valid\": " << -1 << " }";
 		}
 		
 	}
 #if(DEBUG == 0)
+	/*
 	else if (argv3 == "raw")
 	{ //release version sequence
 
@@ -285,12 +387,9 @@ int main(int argc, char* argv[])
 			cout << "\"data_valid\": " << -1 << " }";
 		}
 	}
+	*/
 	else if (argv3 == "block_cosine")
 	{
-		//value for process time check
-		std::chrono::steady_clock::time_point t_begin;
-		std::chrono::steady_clock::time_point t_end;
-		t_begin = std::chrono::steady_clock::now();
 		//block cosine similarity
 		compare* oCompare = new compare(argv[1], argv[2]);
 
@@ -298,84 +397,99 @@ int main(int argc, char* argv[])
 		oCompare->setFormantData();
 		oCompare->setIntensityData();
 		oCompare->setPitchData();
-
-		//median filtering
-		//oCompare->median_function();
+		oCompare->setMFCCData();
 
 		double pitch_avg = oCompare->pitch_average_compare();
 		if (isnan(pitch_avg))
 			pitch_avg = 0.0;
 
-		//median filtering + data block parsing + cosine similarity
-		if (oCompare->makeDataList())
-		{//make dataList success
-			//print to stdout
-			double cosine_pitch_rate = oCompare->block_cosine_compare_pitch();
-			double cosine_int_rate = oCompare->block_cosine_compare_intensity();
-			auto cosine_f_rate = oCompare->block_cosine_compare_formant();
-			double cosine_f2_rate = cosine_f_rate.func2Res;
-			double cosine_f3_rate = cosine_f_rate.func3Res;
+		int mfccDistance = oCompare->getDTWDistance(oCompare->getStandMFCCData(), oCompare->getCompMFCCData());
+		
+		//compare pitch average & mfccDistance
+		if (pitch_avg >= PITCH_COMP_VAL && mfccDistance <= MFCC_COMP_VAL)
+		{
+			//median filtering + data block parsing + cosine similarity
+			if (oCompare->makeDataList())
+			{//make dataList success
+			 //print to stdout
+				double cosine_pitch_rate = oCompare->block_cosine_compare_pitch();
+				double cosine_int_rate = oCompare->block_cosine_compare_intensity();
+				auto cosine_f_rate = oCompare->block_cosine_compare_formant();
+				double cosine_f2_rate = cosine_f_rate.func2Res;
+				double cosine_f3_rate = cosine_f_rate.func3Res;
 
-			if (isnan(cosine_pitch_rate))
-				cosine_pitch_rate = 0.0;
-			if (isnan(cosine_int_rate))
-				cosine_int_rate = 0.0;
-			if (isnan(cosine_f2_rate))
-				cosine_f2_rate = 0.0;
-			if (isnan(cosine_f3_rate))
-				cosine_f3_rate = 0.0;
+				if (isnan(cosine_pitch_rate))
+					cosine_pitch_rate = 0.0;
+				if (isnan(cosine_int_rate))
+					cosine_int_rate = 0.0;
+				if (isnan(cosine_f2_rate))
+					cosine_f2_rate = 0.0;
+				if (isnan(cosine_f3_rate))
+					cosine_f3_rate = 0.0;
 
-			//time end set
-			t_end = std::chrono::steady_clock::now();
 
-			cout << "{ \"pitch_rate\": " << cosine_pitch_rate << ",";
-			cout << "\"pitch_avg\": " << pitch_avg << ",";
-			cout << "\"int_rate\": " << cosine_int_rate << ",";
-			cout << "\"f2_rate\": " << cosine_f2_rate << ",";
-			cout << "\"f3_rate\": " << cosine_f3_rate << ",";
-			cout << "\"stand_block_num_a\": " << oCompare->getStandDataList().getDataList().size() << ",";
-			cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
-			cout << "\"stand_block_num\": "<< oCompare->getInterpolatedStandVec().getDataList().size() << ",";
-			cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
-			cout << "\"proc_time\": " << std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_begin).count() << ",";
-			if (f1_num == '3')
-			{//check attendance
-				cout << "\"data_valid\": " << 0 << " }";
-			}
-			else
-			{//combine data
-			 //corr data set
-			 //true or false?
-				if (pitch_avg > 80.0
-					&& cosine_pitch_rate > 80.0
-					&& cosine_int_rate > 80.0
-					&& cosine_f2_rate > 90.0
-					&& cosine_f3_rate > 90.0)
-				{
-					//true
-					//oCompare->combineData(argv[2]);
-					cout << "\"data_valid\": " << 1 << " }";
+				cout << "{ \"pitch_rate\": " << cosine_pitch_rate << ",";
+				cout << "\"pitch_avg\": " << pitch_avg << ",";
+				cout << "\"int_rate\": " << cosine_int_rate << ",";
+				cout << "\"f2_rate\": " << cosine_f2_rate << ",";
+				cout << "\"f3_rate\": " << cosine_f3_rate << ",";
+				cout << "\"mfcc_distance\": " << mfccDistance << ",";
+				cout << "\"stand_block_num_a\": " << oCompare->getStandDataList().getDataList().size() << ",";
+				cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
+				cout << "\"stand_block_num\": " << oCompare->getInterpolatedStandVec().getDataList().size() << ",";
+				cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
+				if (f1_num == '3')
+				{//check attendance
+					cout << "\"data_valid\": " << 0 << " }";
 				}
 				else
-				{
-					cout << "\"data_valid\": " << -1 << " }";
+				{//combine data
+				 //corr data set
+				 //true or false?
+					if (pitch_avg > 80.0
+						&& cosine_pitch_rate > 80.0
+						&& cosine_int_rate > 80.0
+						&& cosine_f2_rate > 90.0
+						&& cosine_f3_rate > 90.0)
+					{
+						//true
+						//oCompare->combineData(argv[2]);
+						cout << "\"data_valid\": " << 1 << " }";
+					}
+					else
+					{
+						cout << "\"data_valid\": " << -1 << " }";
+					}
 				}
 			}
+			else
+			{//make dataList fail
+			 //end time make data list fail
+				cout << "{ \"pitch_rate\": " << 0.0 << ",";
+				cout << "\"pitch_avg\": " << pitch_avg << ",";
+				cout << "\"int_rate\": " << 0.0 << ",";
+				cout << "\"f2_rate\": " << 0.0 << ",";
+				cout << "\"f3_rate\": " << 0.0 << ",";
+				cout << "\"mfcc_distance\": " << mfccDistance << ",";
+				cout << "\"stand_block_num_a\": " << oCompare->getStandDataList().getDataList().size() << ",";
+				cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
+				cout << "\"stand_block_num\": " << oCompare->getInterpolatedStandVec().getDataList().size() << ",";
+				cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
+				cout << "\"data_valid\": " << -1 << " }";
+			}
 		}
-		else
-		{//make dataList fail
-			//end time make data list fail
-			t_end = std::chrono::steady_clock::now();
+		else // no match pitch, mfcc
+		{
 			cout << "{ \"pitch_rate\": " << 0.0 << ",";
 			cout << "\"pitch_avg\": " << pitch_avg << ",";
 			cout << "\"int_rate\": " << 0.0 << ",";
 			cout << "\"f2_rate\": " << 0.0 << ",";
 			cout << "\"f3_rate\": " << 0.0 << ",";
-			cout << "\"stand_block_num_a\": " << oCompare->getStandDataList().getDataList().size() << ",";
-			cout << "\"comp_block_num_a\": " << oCompare->getCompDataList().getDataList().size() << ",";
-			cout << "\"stand_block_num\": " << oCompare->getInterpolatedStandVec().getDataList().size() << ",";
-			cout << "\"comp_block_num\": " << oCompare->getInterpolatedCompVec().getDataList().size() << ",";
-			cout << "\"proc_time\": " << std::chrono::duration_cast<std::chrono::microseconds>(t_end - t_begin).count() << ",";
+			cout << "\"mfcc_distance\": " << mfccDistance << ",";
+			cout << "\"stand_block_num_a\": " << 0 << ",";
+			cout << "\"comp_block_num_a\": " << 0 << ",";
+			cout << "\"stand_block_num\": " << 0 << ",";
+			cout << "\"comp_block_num\": " << 0 << ",";
 			cout << "\"data_valid\": " << -1 << " }";
 		}
 	}
